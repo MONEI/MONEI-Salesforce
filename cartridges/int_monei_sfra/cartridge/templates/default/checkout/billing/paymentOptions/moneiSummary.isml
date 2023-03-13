@@ -1,0 +1,7 @@
+<div>
+    <div>
+        <span>
+            ${payment.paymentMethod + '/' + pdict.monei.paymentAmount}
+        </span>
+    </div>
+</div>

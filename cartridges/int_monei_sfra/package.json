@@ -1,0 +1,28 @@
+{
+    "hooks": "./cartridge/scripts/hooks.json",
+	"caches": "./caches.json",
+ "scripts": {
+  "lint": "sgmf-scripts --lint js && sgmf-scripts --lint css",
+  "upload": "sgmf-scripts --upload -- ",
+  "uploadCartridge": "sgmf-scripts --uploadCartridge int_monei_sfra",
+  "compile:js": "sgmf-scripts --compile js",
+  "compile:scss": "sgmf-scripts --compile css",
+  "watch": "sgmf-scripts --watch",
+  "build": "sgmf-scripts --compile js && sgmf-scripts --compile css && sgmf-scripts --watch",
+  "cleanJS": "rimraf ./cartridge/static/default/js",
+  "cleanCSS": "rimraf ./cartridge/static/default/css"
+ },
+ "devDependencies": {
+  "css-loader": "^0.28.11",
+  "sass-loader": "^7.0.3",
+  "node-sass": "^4.9.0",
+  "sgmf-scripts": "^2.0.0",
+  "webpack": "^2.1.0-beta.22"
+ },
+ "dependencies": {
+  "bootstrap": "4.3.1",
+  "glob": "^7.1.6",
+  "shell.js": "^3.2.3",
+  "shelljs": "^0.8.4"
+ }
+}
