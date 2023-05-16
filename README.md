@@ -1,6 +1,6 @@
 <img src="https://assets.monei.com/images/logo.svg" alt="MONEI" width="180">
 
-Salesforce Commerce Cloud integration plugin with that payment gateway
+Salesforce Commerce Cloud integration plugin
 
 Instructions:
 
