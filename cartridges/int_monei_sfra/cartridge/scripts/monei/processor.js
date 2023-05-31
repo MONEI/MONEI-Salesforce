@@ -24,8 +24,6 @@ const {
     isPurchaseUnitChanged
 } = require('../monei/helpers/moneiHelper');
 
-
-
 /**
  * Processor Handle
  *
@@ -95,18 +93,15 @@ function authorize(order, paymentInstrument) {
         
     }
 
-   
-
     var response  = authorizePayment(paymentInstrument.custom.moneiPaymentID, purchaseUnit.amount);
     if (response.err) {
         return { error: true };
-    }else{
-
+    } else {
         Transaction.wrap(function () {
             paymentInstrument.getPaymentTransaction().setTransactionID(response.authorizationCode);
             paymentInstrument.custom.moneiPaymentStatus = response.status;
             order.custom.moneiPaymentMethod = 'MONEI';
-            order.custom.Monei_API_PaymentID = paymentInstrument.custom.moneiPaymentID;
+            order.custom.MONEI_API_PaymentID = paymentInstrument.custom.moneiPaymentID;
         });
 
         delete session.privacy.orderDataHash;
@@ -114,7 +109,6 @@ function authorize(order, paymentInstrument) {
         return { authorized: true };
     }
 }
-
 
 module.exports = {
     handle: handle,
