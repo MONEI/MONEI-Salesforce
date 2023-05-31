@@ -15,8 +15,8 @@
         "compile:scss": "sgmf-scripts --compile css",
         "watch": "sgmf-scripts --watch",
         "build": "sgmf-scripts --compile js && sgmf-scripts --compile css && sgmf-scripts --watch",
-        "cleanJS": "rimraf ./cartridge/static/default/js",
-        "cleanCSS": "rimraf ./cartridge/static/default/css"
+        "cleanJS": "rimraf ./cartridges/**/cartridge/static/default/js",
+        "cleanCSS": "rimraf ./cartridges/**/cartridge/static/default/css"
     },
     "repository": {
         "type": "git",
@@ -25,10 +25,15 @@
     "devDependencies": {
         "autoprefixer": "^9.8.8",
         "css-loader": "^1.0.1",
+        "eslint": "^3.19.0",
+        "eslint-config-airbnb-base": "^5.0.3",
         "postcss-loader": "^3.0.0",
         "sass": "^1.51.0",
         "sass-loader": "^7.3.1",
         "sgmf-scripts": "^2.4.2",
+        "stylelint": "^8.0.0",
+        "stylelint-config-standard": "^17.0.0",
+        "stylelint-scss": "^2.5.0",
         "webpack": "^4.0.0"
     },
     "packageName": "int_monei_sfra"
