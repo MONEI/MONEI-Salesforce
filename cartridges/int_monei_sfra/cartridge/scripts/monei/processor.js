@@ -24,8 +24,6 @@ const {
     isPurchaseUnitChanged
 } = require('../monei/helpers/moneiHelper');
 
-
-
 /**
  * Processor Handle
  *
@@ -38,21 +36,19 @@ function handle(basket, paymentInformation) {
     var paymentProcessor = PaymentMgr.getPaymentMethod(paymentInformation.billingForm.paymentMethod.value).getPaymentProcessor();
     var orderIdDetails;
 
-    
     Transaction.wrap(function () {
         paymentInstrument.paymentTransaction.setPaymentProcessor(paymentProcessor);
-            var moneiOrders = getMoneiNewTransaction(paymentInformation.billingForm.monei.orderID.value, paymentInformation.billingForm.monei.moneiPaymentID.value);
-            if (moneiOrders && moneiOrders.hasNext()){
-                paymentInstrument.custom.moneiPaymentID = paymentInformation.billingForm.monei.moneiPaymentID.value;
-            }else{
-                return { error: true };
-            }
-            
-            orderIdDetails = {
-                orderId: paymentInformation.billingForm.monei.orderID.value,
-                moneiPaymentID: paymentInformation.billingForm.monei.moneiPaymentID.value
-            };
-        
+        var moneiOrders = getMoneiNewTransaction(paymentInformation.billingForm.monei.orderID.value, paymentInformation.billingForm.monei.moneiPaymentID.value);
+        if (moneiOrders && moneiOrders.hasNext()){
+            paymentInstrument.custom.moneiPaymentID = paymentInformation.billingForm.monei.moneiPaymentID.value;
+        } else {
+            return { error: true };
+        }
+
+        orderIdDetails = {
+            orderId: paymentInformation.billingForm.monei.orderID.value,
+            moneiPaymentID: paymentInformation.billingForm.monei.moneiPaymentID.value
+        };
     });
 
     return {
@@ -73,7 +69,6 @@ function authorize(order, paymentInstrument) {
     const purchaseUnit = getPaymentInfo(order, session.privacy.paymentEmail, session.privacy.paymentPhone);
     const isUpdateRequired = isPurchaseUnitChanged(purchaseUnit);
     delete session.privacy.moneiUsedOrderNo;
-   
 
     if (empty(paymentInstrument) || empty(order) || order.status === Order.ORDER_STATUS_FAILED) {
         return { error: true };
@@ -87,26 +82,25 @@ function authorize(order, paymentInstrument) {
         let { err } = cancelPayment(paymentInstrument.custom.moneiPaymentID);
         delete session.privacy.orderDataHash;
         deleteMoneiNewTransaction(purchaseUnit.orderId, paymentInstrument.custom.moneiPaymentID);
-            return {
-                authorized: false,
-                error: true,
-                message: err
-            };
-        
+        return {
+            authorized: false,
+            error: true,
+            message: err
+        };
     }
-
-   
 
     var response  = authorizePayment(paymentInstrument.custom.moneiPaymentID, purchaseUnit.amount);
     if (response.err) {
         return { error: true };
-    }else{
-
+    } else {
         Transaction.wrap(function () {
             paymentInstrument.getPaymentTransaction().setTransactionID(response.authorizationCode);
             paymentInstrument.custom.moneiPaymentStatus = response.status;
             order.custom.moneiPaymentMethod = 'MONEI';
             order.custom.Monei_API_PaymentID = paymentInstrument.custom.moneiPaymentID;
+            if (response.status === "SUCCEEDED") {
+                order.setPaymentStatus(dw.order.Order.PAYMENT_STATUS_PAID);
+            }
         });
 
         delete session.privacy.orderDataHash;
@@ -114,7 +108,6 @@ function authorize(order, paymentInstrument) {
         return { authorized: true };
     }
 }
-
 
 module.exports = {
     handle: handle,
