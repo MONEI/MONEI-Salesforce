@@ -1,11 +1,9 @@
 'use strict';
 
+$(document).ready(function () {
+    require('./formErrors');
+    require('./scrollAnimate');
 
-var formHelpers = require('./formErrors');
-var scrollAnimate = require('./scrollAnimate');
-
-
-$( document ).ready(function() {
-    $(".monei-tab").trigger('click');
-    $("button[type='submit'].submit-payment").trigger('click');
+    $('.monei-tab').trigger('click');
+    $('button[type="submit"].submit-payment').trigger('click');
 });

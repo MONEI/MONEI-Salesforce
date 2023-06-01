@@ -32,12 +32,11 @@ function getPreferences() {
         return prefs;
     }
 
-   
     const site = require('dw/system/Site').current;
     var paymentMethods = site.getCustomPreferenceValue('MONEI_API_Payment_Methods');
     var paymentMethodsString = [];
-    if (paymentMethods){
-        for(var i = 0; i < paymentMethods.length; i++){
+    if (paymentMethods) {
+        for (var i = 0; i < paymentMethods.length; i++) {
             paymentMethodsString[i] = paymentMethods[i].getValue();
         }
     }
