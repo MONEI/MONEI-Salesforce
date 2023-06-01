@@ -97,7 +97,7 @@ function authorize(order, paymentInstrument) {
             paymentInstrument.getPaymentTransaction().setTransactionID(response.authorizationCode);
             paymentInstrument.custom.moneiPaymentStatus = response.status;
             order.custom.moneiPaymentMethod = 'MONEI';
-            order.custom.Monei_API_PaymentID = paymentInstrument.custom.moneiPaymentID;
+            order.custom.MONEI_API_PaymentID = paymentInstrument.custom.moneiPaymentID;
             if (response.status === "SUCCEEDED") {
                 order.setPaymentStatus(dw.order.Order.PAYMENT_STATUS_PAID);
             }
