@@ -32,8 +32,8 @@ server.append('Begin', function (_, res, next) {
     var status = _.querystring.status;
     var amount;
     var hasDefaultPaymentMethod;
-    
-    if (!moneiPaymentID || !orderId){
+
+    if (!moneiPaymentID || !orderId) {
         if (isExpiredTransaction(moneiPaymentInstrument)) {
             removeMoneiPaymentInstrument(basket);
         }
@@ -57,15 +57,15 @@ server.append('Begin', function (_, res, next) {
             }
         });
         next();
-    }else{
-        if (status=== 'FAILED' || status === 'PaymentCanceled'){
+    } else {
+        if (status === 'FAILED' || status === 'PaymentCanceled'){
             res.setViewData({monei:{
                 error: _.querystring.message
                 }
             });
             next();
-        }else if (status=== 'AUTHORIZED'){
-            //Check if payment was correct
+        } else if (status=== 'AUTHORIZED') {
+            // Check if payment was correct
             var moneiOrders = getMoneiNewTransaction(orderId, moneiPaymentID);
             if (moneiOrders && moneiOrders.hasNext()){
                 if (moneiPaymentInstrument) {
@@ -73,13 +73,13 @@ server.append('Begin', function (_, res, next) {
                     paymentAmount = new Money(amount, currency);
                     if (moneiPaymentInstrument.custom.moneiPaymentID) {
                         moneiPaymentID = moneiPaymentInstrument.custom.moneiPaymentID;
-                    }else{
+                    } else {
                         Transaction.wrap(function () {
                             moneiPaymentInstrument.custom.moneiPaymentID = _.querystring.id;
                         });
                     }
-                
                 }
+
                 res.setViewData({
                     monei: {
                         paymentAmount: formatMoney(paymentAmount),
@@ -91,41 +91,9 @@ server.append('Begin', function (_, res, next) {
                     }
                 });
                 next();
-            }else{
-                //VOLVEMOS A COMPROBAR DESPUES DE 3 SEGUNDOS
-               setTimeout(function(){var moneiOrders = getMoneiNewTransaction(orderId, moneiPaymentID);
-                if (moneiOrders && moneiOrders.hasNext()){
-                    if (moneiPaymentInstrument) {
-                        amount = moneiPaymentInstrument.paymentTransaction.amount.value;
-                        paymentAmount = new Money(amount, currency);
-                        if (moneiPaymentInstrument.custom.moneiPaymentID) {
-                            moneiPaymentID = moneiPaymentInstrument.custom.moneiPaymentID;
-                        }
-                    }
-                    res.setViewData({
-                        monei: {
-                            paymentAmount: formatMoney(paymentAmount),
-                            prefs: prefs,
-                            partnerAttributionId: prefs.partnerAttributionId,
-                            hasDefaultPaymentMethod: hasDefaultPaymentMethod,
-                            moneiPaymentID: _.querystring.id,
-                            orderId: orderId
-                        }
-                    });
-                }else{
-                    res.setViewData({monei:{
-                        error:"No se ha encontrado el pago asociado"
-                        }
-                    });
-                }
-                
-             next();
-            }, 3000);
-                
             }
         }
     }
 });
-
 
 module.exports = server.exports();

@@ -1,3 +1,3 @@
-$( document ).ready(function() {
-        $(".monei-tab").trigger('click');
+$(document).ready(function () {
+    $('.monei-tab').trigger('click');
 });
