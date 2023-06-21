@@ -5,6 +5,7 @@ var OrderMgr = require('dw/order/OrderMgr');
 var moneiHelper = require('*/cartridge/scripts/helpers/moneiHelper');
 var moneiOrderHelper = require('*/cartridge/scripts/helpers/moneiOrderHelper');
 var URLUtils = require('dw/web/URLUtils');
+var Resource = require('dw/web/Resource');
 var server = require('server');
 
 server.post('orderData', function (req, res, next) {
@@ -85,6 +86,7 @@ server.post('placeOrder', function (req, res, next) {
 });
 
 server.post('failOrder', function (req, res, next) {
+    var BasketMgr = require('dw/order/BasketMgr');
     var result = {
         error: true,
         orderId: req.form.orderId,
@@ -93,11 +95,18 @@ server.post('failOrder', function (req, res, next) {
 
     var order = OrderMgr.getOrder(req.form.orderId);
     if (order) {
-        result = moneiOrderHelper.cancelOrFailOrder(order, true);
+        result = moneiOrderHelper.cancelOrFailOrder(order);
+        if (!result) {
+            var Transaction = require('dw/system/Transaction');
+            session.custom.moneiErrorMessage = Resource.msg('error.technical', 'checkout', null);
+            Transaction.wrap(function () {
+                BasketMgr.createBasketFromOrder(order);
+            });
+        }
     }
 
     res.json({
-        error: result.error,
+        error: result,
         redirectUrl: URLUtils.url('Checkout-Begin', 'showMoneiError', true, 'stage', 'payment').toString()
     });
 
@@ -111,6 +120,10 @@ server.post('Callback', function (req, res, next) {
     if (result && !result.error) {
         moneiOrderHelper.updateNotifiedOrder(result, currentLocale);
     }
+
+    res.json({
+        error: result && result.error ? result.error : true
+    });
 
     next();
 });
