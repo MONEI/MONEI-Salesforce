@@ -55,15 +55,12 @@ function getApiKey() {
  * @returns {Object} monei preferences
  */
 function getPreferences() {
-    prefs = {
+    return {
         accountId: getAccountId(),
         sessionId: generateSessionUniqueID(),
         paymentPageType: site.getCustomPreferenceValue('MONEI_API_Type_Page').getValue(),
-        description: site.getCustomPreferenceValue('MONEI_API_Message'),
-        urlApiMonei: site.getCustomPreferenceValue('MONEI_API_URL').toString()
+        urlMoneiClientPlugin: site.getCustomPreferenceValue('MONEI_Plugin_Url').toString()
     };
-
-    return prefs;
 }
 
 module.exports = {
