@@ -1,0 +1,16 @@
+<div class="tab-pane active monei-bizum-content monei-content" id="monei-bizum-content" role="tabpanel">
+    <fieldset class="payment-form-fields">
+        <isif condition="${pdict.monei.error !=null}">
+            <div class="monei-error">
+                <isprint value="${pdict.monei.error}" encoding="on" />
+            </div>
+        </isif>
+        <input type="hidden" class="form-control" name="${pdict.forms.billingForm.paymentMethod.htmlName}" value="MONEI_BIZUM">
+        <input type="hidden" class="form-control" name="${pdict.forms.billingForm.moneiPaymentFields.moneiToken.htmlName}" value="" />
+        <input type="hidden" class="form-control" name="${pdict.forms.billingForm.moneiPaymentFields.moneiAmount.htmlName}" value="" />
+        <input type="hidden" class="form-control" name="${pdict.forms.billingForm.moneiPaymentFields.moneiCurrency.htmlName}" value="" />
+        <input type="hidden" class="form-control" name="${pdict.forms.billingForm.moneiPaymentFields.moneiSessionID.htmlName}" value="${pdict.monei.prefs.sessionId}">
+ 
+        <div class="monei-bizum-button-container"></div>
+    </fieldset>
+</div>

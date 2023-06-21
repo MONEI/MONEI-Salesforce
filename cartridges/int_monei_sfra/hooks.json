@@ -1,16 +1,12 @@
 {
     "hooks": [
         {
-            "name": "app.payment.form.processor.monei",
-            "script": "./cartridge/scripts/hooks/payment/processor/monei"
+            "name": "app.payment.form.processor.monei_bizum",
+            "script": "./cartridge/scripts/hooks/payment/processor/bizum/monei_form_processor"
         },
         {
-            "name": "app.payment.processor.monei",
-            "script": "./cartridge/scripts/hooks/payment/processor/monei"
-        },
-        {
-            "name": "dw.order.createOrderNo",
-            "script": "./cartridge/scripts/hooks/payment/processor/monei"
+            "name": "app.payment.processor.monei_bizum",
+            "script": "./cartridge/scripts/hooks/payment/processor/bizum/monei_processor"
         }
     ]
 }

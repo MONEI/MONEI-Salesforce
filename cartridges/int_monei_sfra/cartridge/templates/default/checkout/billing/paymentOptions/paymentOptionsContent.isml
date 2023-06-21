@@ -1,8 +1,18 @@
+<isif condition="${!empty(pdict.monei)}">
+    <input type="hidden" name="monei_id" value="${pdict.monei.prefs.accountId}">
+    <input type="hidden" name="monei_lang" value="${pdict.monei.locale}">
+    <input type="hidden" name="monei_dataEndpoint" value="${pdict.monei.dataEndpoint}">
+    <input type="hidden" name="monei_createOrderEndpoint" value="${pdict.monei.createOrderEndpoint}">
+    <input type="hidden" name="monei_placeOrderEndpoint" value="${pdict.monei.placeOrderEndpoint}">
+    <input type="hidden" name="monei_failOrderEndpoint" value="${pdict.monei.failOrderEndpoint}">
+    <input type="hidden" name="monei_cartEndpoint" value="${pdict.monei.cartEndpoint}">
+</isif>
+
 <isloop items="${pdict.order.billing.payment.applicablePaymentMethods}" var="paymentOption">
     <isif condition="${paymentOption.ID === 'CREDIT_CARD'}">
         <isinclude template="checkout/billing/paymentOptions/creditCardContent" />
     </isif>
-    <isif condition="${paymentOption.ID === 'MONEI'}">
-        <isinclude template="checkout/billing/paymentOptions/moneiContent" />
+    <isif condition="${paymentOption.ID === 'MONEI_BIZUM'}">
+        <isinclude template="checkout/billing/paymentOptions/monei/moneiBizumContent" />
     </isif>
 </isloop>

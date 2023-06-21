@@ -3,8 +3,8 @@
         <isif condition="${payment.paymentMethod === 'CREDIT_CARD'}">
             <isinclude template="checkout/billing/paymentOptions/creditCardSummary" />
         </isif>
-        <isif condition="${payment.paymentMethod === 'MONEI'}">
-            <isinclude template="checkout/billing/paymentOptions/moneiSummary" />
+        <isif condition="${payment.paymentMethod === 'MONEI_BIZUM'}">
+            <isinclude template="checkout/billing/paymentOptions/monei/moneiBizumSummary" />
         </isif>
     </isloop>
 </div>
