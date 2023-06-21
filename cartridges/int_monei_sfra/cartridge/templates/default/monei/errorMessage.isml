@@ -1,0 +1,13 @@
+<iscomment>This template should be included on checkout page</iscomment>
+<isif condition="${!empty(session.custom.moneiErrorMessage) && pdict.CurrentHttpParameterMap.get('showMoneiError').booleanValue === true}">
+    <div class="alert alert-danger alert-dismissible valid-cart-error fade show" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        <isprint value="${session.custom.moneiErrorMessage}"/>
+
+        <isscript>
+            delete session.custom.moneiErrorMessage;
+        </isscript>
+    </div>
+</isif>

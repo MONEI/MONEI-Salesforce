@@ -1,99 +1,27 @@
 'use strict';
 
-var page = module.superModule;
+var moneiHelper = require('*/cartridge/scripts/helpers/moneiHelper');
 var server = require('server');
-var Money = require('dw/value/Money');
-var BasketMgr = require('dw/order/BasketMgr');
-var formatMoney = require('dw/util/StringUtils').formatMoney;
 
-var {
-    isExpiredTransaction
-} = require('../scripts/monei/helpers/moneiHelper');
+server.extend(module.superModule);
 
-var {
-    getMoneiNewTransaction
-} = require('../scripts/monei/moneiUtils');
+server.append('Begin', function (req, res, next) {
+	var URLUtils = require('dw/web/URLUtils');
+	var viewData = res.getViewData();
 
-var {
-    getMoneiPaymentInstrument,
-    removeMoneiPaymentInstrument
-} = require('../scripts/monei/helpers/paymentInstrumentHelper');
-const prefs = require('../config/moneiPreferences');
+	viewData.monei = {
+		prefs: moneiHelper.getPreferences(),
+		data: moneiHelper.getOrderData(viewData.order),
+		locale: moneiHelper.getCurrentLanguage(req.locale),
+		dataEndpoint: URLUtils.url('Monei-orderData').toString(),
+		createOrderEndpoint: URLUtils.url('Monei-createOrder').toString(),
+		placeOrderEndpoint: URLUtils.url('Monei-placeOrder').toString(),
+		failOrderEndpoint: URLUtils.url('Monei-failOrder').toString(),
+		cartEndpoint: URLUtils.url('Cart-Show').toString()
+	}
+	res.setViewData(viewData);
 
-server.extend(page);
-
-server.append('Begin', function (_, res, next) {
-    var basket = BasketMgr.getCurrentBasket();
-    var currency = basket.getCurrencyCode();
-    var moneiPaymentInstrument = getMoneiPaymentInstrument(basket);
-    var paymentAmount = new Money(0, currency);
-    var moneiPaymentID = _.querystring.id;
-    var orderId = _.querystring.orderId;
-    var status = _.querystring.status;
-    var amount;
-    var hasDefaultPaymentMethod;
-
-    if (!moneiPaymentID || !orderId) {
-        if (isExpiredTransaction(moneiPaymentInstrument)) {
-            removeMoneiPaymentInstrument(basket);
-        }
-
-        if (moneiPaymentInstrument) {
-            amount = moneiPaymentInstrument.paymentTransaction.amount.value;
-            paymentAmount = new Money(amount, currency);
-            if (moneiPaymentInstrument.custom.moneiPaymentID) {
-                moneiPaymentID = moneiPaymentInstrument.custom.moneiPaymentID;
-            }
-        }
-
-        res.setViewData({
-            monei: {
-                paymentAmount: formatMoney(paymentAmount),
-                prefs: prefs,
-                partnerAttributionId: prefs.partnerAttributionId,
-                hasDefaultPaymentMethod: hasDefaultPaymentMethod,
-                moneiPaymentID: moneiPaymentID,
-                orderId:orderId
-            }
-        });
-        next();
-    } else {
-        if (status === 'FAILED' || status === 'PaymentCanceled'){
-            res.setViewData({monei:{
-                error: _.querystring.message
-                }
-            });
-            next();
-        } else if (status=== 'AUTHORIZED') {
-            // Check if payment was correct
-            var moneiOrders = getMoneiNewTransaction(orderId, moneiPaymentID);
-            if (moneiOrders && moneiOrders.hasNext()){
-                if (moneiPaymentInstrument) {
-                    amount = moneiPaymentInstrument.paymentTransaction.amount.value;
-                    paymentAmount = new Money(amount, currency);
-                    if (moneiPaymentInstrument.custom.moneiPaymentID) {
-                        moneiPaymentID = moneiPaymentInstrument.custom.moneiPaymentID;
-                    } else {
-                        Transaction.wrap(function () {
-                            moneiPaymentInstrument.custom.moneiPaymentID = _.querystring.id;
-                        });
-                    }
-                }
-
-                res.setViewData({
-                    monei: {
-                        paymentAmount: formatMoney(paymentAmount),
-                        prefs: prefs,
-                        partnerAttributionId: prefs.partnerAttributionId,
-                        hasDefaultPaymentMethod: hasDefaultPaymentMethod,
-                        moneiPaymentID: _.querystring.id,
-                        orderId: orderId
-                    }
-                });
-                next();
-            }
-        }
-    }
+	next();
 });
 
 module.exports = server.exports();

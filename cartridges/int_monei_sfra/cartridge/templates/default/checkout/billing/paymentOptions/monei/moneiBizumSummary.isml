@@ -1,0 +1,8 @@
+<div>
+	<div class="monei-method-name">
+		<isprint value="${payment.paymentMethodName}" />
+	</div>
+	<div class="monei-amount">
+		<isprint value="${payment.formattedAmount}" />
+	</div>
+</div>

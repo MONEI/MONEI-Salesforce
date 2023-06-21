@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<form xmlns="http://www.demandware.com/xml/form/2008-04-19">
+	<field formid="moneiToken" type="string" mandatory="false" />
+	<field formid="moneiAmount" type="string" mandatory="false" />
+	<field formid="moneiCurrency" type="string" mandatory="false" />
+	<field formid="moneiSessionID" type="string" mandatory="false" />
+</form>

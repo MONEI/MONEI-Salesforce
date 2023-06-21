@@ -12,9 +12,9 @@
 
     <include formid="creditCardFields" name="creditCard"/>
 
-    <field formid="subscribe" type="boolean" checked="false" default-value="false" mandatory="false" />
-    
     <!-- fields for Monei selection -->
-	<include formid="monei" name="monei"/>
+	<include formid="moneiPaymentFields" name="moneiPayment"/>
+
+    <field formid="subscribe" type="boolean" checked="false" default-value="false" mandatory="false" />
 
 </form>
