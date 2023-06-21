@@ -15,24 +15,22 @@ function getPreferences() {
 }
 
 function getOrderData(order) {
-    if (!empty(order)) {
-        return {
-            amount: order.moneiOrderData.amount,
-            currency: order.moneiOrderData.currencyCode
-        }
+    var orderData = {};
+
+    if (order) {
+        orderData.amount = order.moneiOrderData.amount;
+        orderData.currency = order.moneiOrderData.currencyCode;
     }
+
+    return orderData;
 }
 
 function getServiceName() {
     return serviceName;
 }
 
-function getApiKey() {
-    return serviceName;
-}
-
 function getCurrentLanguage(locale) {
-    var language;
+    var language = 'en';
 
     if (!empty(locale) && Object.hasOwnProperty.call(locale, 'id')) {
         var currentLocale = Locale.getLocale(locale.id);
@@ -43,13 +41,13 @@ function getCurrentLanguage(locale) {
         }
     }
 
-    return language ? language : 'en';
+    return language;
 }
 
 function toHexString(byteArray) {
     var s = '';
 
-    for(var i = 0; i < byteArray.getLength(); i++){
+    for (var i = 0; i < byteArray.getLength(); i++) {
         s += ('0' + (byteArray.byteAt(i) & 0xFF).toString(16)).slice(-2);
     }
 
@@ -58,21 +56,21 @@ function toHexString(byteArray) {
 
 /**
  * Create URL for a call
- * @param  {string} host
+ * @param  {string} host the host
  * @param  {string} path REST action endpoint
  * @returns {string} url for a call
  */
 function getUrlPath(host, path) {
     var url = host;
     if (!url.match(/.+\/$/)) {
-        if (!path.match(/^\//)){
+        if (!path.match(/^\//)) {
             url += '/';
         }
-    } else {
-        if (path.match(/^\//)){
-            return url += path.substring(1);
-        }
+    } else if (path.match(/^\//)) {
+        url += path.substring(1);
+        return url;
     }
+
     url += path;
     return url;
 }
@@ -84,7 +82,7 @@ function getUrlPath(host, path) {
  */
 function createErrorLog(err) {
     var Logger = require('dw/system/Logger');
-    logger = Logger.getLogger('Monei', 'Monei_General');
+    var logger = Logger.getLogger('Monei', 'Monei_General');
 
     if (!empty(err)) {
         logger.error(err);
@@ -109,10 +107,9 @@ function createErrorMsg(errorName) {
  *
  * @param {dw.order.Basket} currentBasket - the current basket
  * @param {Object} paymentInformation - monei current details retrieved by form_processor hook
- * @returns {object} payload - the payload to be sent to Monei API
+ * @returns {Object} payload - the payload to be sent to Monei API
  */
 function createPaymentPayload(currentBasket, paymentInformation) {
-    var moneiPreferences = require('*/cartridge/config/moneiPreferences');
     var payload = {};
     var orderNo = currentBasket instanceof Order ? currentBasket.orderNo : OrderMgr.createOrderNo();
 
@@ -121,7 +118,7 @@ function createPaymentPayload(currentBasket, paymentInformation) {
     payload.amount = paymentInformation.moneiAmont.value;
     payload.currency = paymentInformation.moneiCurrency.value;
     payload.orderId = orderNo;
-    payload.description = Resource.msg('global.storename', 'common', null) + ' - ' + orderNo,
+    payload.description = Resource.msg('global.storename', 'common', null) + ' - ' + orderNo;
     payload.callbackUrl = URLUtils.https('Monei-Callback').toString();
     payload.billingDetails = {
         name: currentBasket.billingAddress.fullName,
@@ -158,7 +155,6 @@ function createPaymentPayload(currentBasket, paymentInformation) {
 
 function verifySignature(body, signature) {
     var Mac = require('dw/crypto/Mac');
-    var moneiPreferences = require('*/cartridge/config/moneiPreferences');
     var result = {
         error: false
     };
@@ -173,9 +169,9 @@ function verifySignature(body, signature) {
     }
 
     var hmac = Mac(Mac.HMAC_SHA_256);
-    var result = hmac.digest(params['t'] + '.' + body, moneiPreferences.getApiKey());
-  
-    if (moneiHelper.toHexString(result)!== params.v1) {
+    result = hmac.digest(params.t + '.' + body, moneiPreferences.getApiKey());
+
+    if (toHexString(result) !== params.v1) {
         createErrorLog(Resource.msg('monei.error.signature', 'moneierrors', null));
         result.error = true;
     }

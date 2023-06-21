@@ -1,7 +1,5 @@
 'use strict';
 
-var Transaction = require('dw/system/Transaction');
-var Money = require('dw/value/Money');
 var moneiRestService = require('*/cartridge/scripts/service/moneiRestService');
 var moneiHelper = require('*/cartridge/scripts/helpers/moneiHelper');
 

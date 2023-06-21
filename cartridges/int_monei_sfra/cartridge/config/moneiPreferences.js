@@ -1,3 +1,5 @@
+/* global session */
+
 'use strict';
 
 var UUIDUtils = require('dw/util/UUIDUtils');
@@ -11,7 +13,7 @@ const moneiStatus = {
     REFUNDED: 'REFUNDED',
     PARTIALLY_REFUNDED: 'PARTIALLY_REFUNDED',
     EXPIRED: 'EXPIRED'
-}
+};
 
 /**
  * Generate session ID
@@ -22,7 +24,7 @@ const moneiStatus = {
 function generateSessionUniqueID() {
     var sessionUniqueID;
 
-    if (!empty(session.privacy.moneiUniqueID)) {
+    if (Object.hasOwnProperty.call(session.privacy, 'moneiUniqueID')) {
         sessionUniqueID = session.privacy.moneiUniqueID;
     } else {
         sessionUniqueID = UUIDUtils.createUUID();
@@ -34,7 +36,7 @@ function generateSessionUniqueID() {
 /**
  * Returns Monei account ID from site preferences
  *
- * @returns {String} the account ID
+ * @returns {string} the account ID
  */
 function getAccountId() {
     return site.getCustomPreferenceValue('MONEI_API_Account_ID');
@@ -43,7 +45,7 @@ function getAccountId() {
 /**
  * Returns Monei api key from site preferences
  *
- * @returns {String} the Api Key
+ * @returns {string} the Api Key
  */
 function getApiKey() {
     return site.getCustomPreferenceValue('MONEI_API_Key');
@@ -68,4 +70,4 @@ module.exports = {
     getAccountId: getAccountId,
     getApiKey: getApiKey,
     status: moneiStatus
-}
+};

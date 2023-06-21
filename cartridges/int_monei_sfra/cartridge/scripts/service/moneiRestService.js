@@ -3,9 +3,8 @@
 var Resource = require('dw/web/Resource');
 var moneiHelper = require('*/cartridge/scripts/helpers/moneiHelper');
 var moneiPreferences = require('*/cartridge/config/moneiPreferences');
-var moneiHelper = require('*/cartridge/scripts/helpers/moneiHelper');
 
-/** 
+/**
  * createRequest callback for a service
  * @param  {dw.svc.Service} service service instance
  * @param  {Object} data call data with path, method, body for a call or createToken in case of recursive call
@@ -17,7 +16,7 @@ function createRequest(service, data) {
     if (!(credential instanceof ServiceCredential)) {
         throw new Error(Resource.msgf('service.nocredentials', 'moneierrors', null, moneiHelper.getServiceName()));
     }
-    var { path, method, body} = data;
+    var { path, method, body } = data;
 
     service.setURL(moneiHelper.getUrlPath(credential.URL, path));
     service.addHeader('Content-Type', 'application/json');
@@ -69,7 +68,7 @@ module.exports = (function () {
             var errorData = JSON.parse(result.message);
             if (errorData) {
                 errorMessage = errorData;
-            } 
+            }
 
             throw new Error(errorMessage.toLowerCase());
         }

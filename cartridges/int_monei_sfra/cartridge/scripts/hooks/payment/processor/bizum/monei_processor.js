@@ -5,14 +5,10 @@ var Transaction	= require('dw/system/Transaction');
 var moneiAPI = require('*/cartridge/scripts/monei/moneiAPI');
 var moneiHelper = require('*/cartridge/scripts/helpers/moneiHelper');
 
-const PAYMENT_ID = "MONEI_BIZUM";
+const PAYMENT_ID = 'MONEI_BIZUM';
 
-/**
- * simple hook for bizum processing
- * @return {Object} an object that contains standard valid information
- */
-function Handle(basket, paymentInformation, paymentMethodID, req) {
-	var currentBasket = basket;
+function Handle(basket, paymentInformation) {
+    var currentBasket = basket;
     var error = false;
 
     Transaction.wrap(function () {
@@ -34,14 +30,11 @@ function Handle(basket, paymentInformation, paymentMethodID, req) {
         }
     });
 
-    return { fieldErrors: {}, serverErrors: [], error: error }
+    return { fieldErrors: {}, serverErrors: [], error: error };
 }
 
-/**
- * simple hook for bizum processing
- * @return {Object} an object that contains standard valid information
- */
 function Authorize(orderNumber, paymentInstrument, paymentProcessor) {
+    var Resource = require('dw/web/Resource');
     var OrderMgr = require('dw/order/OrderMgr');
     var serverErrors = [];
     var error = false;

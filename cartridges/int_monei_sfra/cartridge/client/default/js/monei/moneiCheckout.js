@@ -1,12 +1,13 @@
-var scrollAnimate = require('../components/scrollAnimate');
+/* global monei */
+
 var moneiOrderData = {};
 var bizum;
 var currentlyCalling = false;
 var confirmationPaymentErrorStatus = [
-    "FAILED",
-    "CANCELED",
-    "EXPIRED"
-]
+    'FAILED',
+    'CANCELED',
+    'EXPIRED'
+];
 
 function moneiTokenHandler(token) {
     $("[name='dwfrm_billing_moneiPaymentFields_moneiToken']").val(token);
@@ -21,7 +22,7 @@ function initBizumButton() {
         bizum.close();
     }
 
-    bizum = monei.Bizum({
+    bizum = monei.Bizum({ // eslint-disable-new-cap
         accountId: $("[name='monei_id']").val(),
         sessionId: $("[name='dwfrm_billing_moneiPaymentFields_moneiSessionID']").val(),
         amount: moneiOrderData.amount,
@@ -31,11 +32,31 @@ function initBizumButton() {
             moneiTokenHandler(result.token);
         },
         onError(error) {
-            $(".monei-error").html(error);
-            $(".monei-error").show();
+            $('.monei-error').html(error);
+            $('.monei-error').show();
         }
     });
-    bizum.render("#monei-bizum-content .monei-bizum-button-container");
+    bizum.render('#monei-bizum-content .monei-bizum-button-container');
+}
+
+function ensureMoneiContentVisibility() {
+    if ($('.monei-tab').hasClass('active')) {
+        setTimeout(function () {
+            var $paymentOptionsTabs = $('.payment-options a[data-toggle="tab"]');
+            var $content = $($('.monei-tab.active').attr('href'));
+            if ($content.length > 0) {
+                $paymentOptionsTabs.trigger('shown.bs.tab');
+                $content.addClass('active');
+            }
+        }, 250);
+    }
+}
+
+
+function renderMoneiComponents() {
+    if ($('#monei-bizum-content').length > 0) {
+        initBizumButton();
+    }
 }
 
 function managePaymentSelections() {
@@ -53,20 +74,16 @@ function managePaymentSelections() {
             }
         });
 
-        // TODO
-        setTimeout(function() {
+        setTimeout(function () {
             var $submitPaymentBtn = $('.submit-payment');
-            var $currentTabContent = $($(e.target).attr('href'));
-            if ($(e.target).parent().attr('data-method-id').toLowerCase().indexOf('monei') > -1) {
-                $submitPaymentBtn.hide()
-            } else if ($(e.target).parent().attr('data-method-id').indexOf('klarna') <= -1 &&
-                $currentTabContent.find('.js_paypal_button_on_billing_form').length <= 0) {
-                $submitPaymentBtn.show()
+            var currentPaymentId = $(e.target).parent().attr('data-method-id').toLowerCase();
+            if (currentPaymentId.indexOf('monei') > -1) {
+                $submitPaymentBtn.hide();
             }
         }, 100);
     });
 
-    $('body').on('checkout:updateCheckoutView', function() {
+    $('body').on('checkout:updateCheckoutView', function () {
         ensureMoneiContentVisibility();
     });
 
@@ -79,24 +96,11 @@ function managePaymentSelections() {
     });
 }
 
-function ensureMoneiContentVisibility() {
-    if ($('.monei-tab').hasClass('active')) {
-        setTimeout(function() {
-            var $paymentOptionsTabs = $('.payment-options a[data-toggle="tab"]');
-            var $content = $($('.monei-tab.active').attr('href'));
-            if ($content.length > 0) {
-                $paymentOptionsTabs.trigger('shown.bs.tab');
-                $content.addClass('active');
-            }
-        }, 250);
-    }
-}
-
 function checkOrderDataForRendering(order) {
     var recreateFlag = false;
     if (Object.prototype.hasOwnProperty.call(order, 'moneiOrderData')) {
         if (Object.prototype.hasOwnProperty.call(moneiOrderData, 'currency')) {
-            if (moneiOrderData.currency != order.moneiOrderData.currency) {
+            if (moneiOrderData.currency !== order.moneiOrderData.currency) {
                 recreateFlag = true;
             }
         } else {
@@ -105,7 +109,7 @@ function checkOrderDataForRendering(order) {
         moneiOrderData.currency = order.moneiOrderData.currency;
 
         if (Object.prototype.hasOwnProperty.call(moneiOrderData, 'amount')) {
-            if (moneiOrderData.amount != order.moneiOrderData.amount) {
+            if (moneiOrderData.amount !== order.moneiOrderData.amount) {
                 moneiOrderData.amount = order.moneiOrderData.amount;
                 recreateFlag = true;
             }
@@ -113,9 +117,9 @@ function checkOrderDataForRendering(order) {
             recreateFlag = true;
         }
         moneiOrderData.amount = order.moneiOrderData.amount;
-
-        return recreateFlag;
     }
+
+    return recreateFlag;
 }
 
 function getOrderData() {
@@ -133,63 +137,14 @@ function getOrderData() {
     }
 }
 
-function renderMoneiComponents() {
-    if ($("#monei-bizum-content").length > 0) {
-        initBizumButton();
-    }
-}
-
-/**
- * Generate Monei place order button
- *
- * @return {Void}
- */
-function generatePlaceOrderButton() {
-    var $placeOrderBtn = $('.place-order');
-    var $moneiPlaceOrderBtnContainer = $('\
-    <div class="monei-place-order">\
-        <button type="submit" class="btn btn-primary monei-button">\
-        ' +  $('.place-order').text().trim().toString() + '\
-        </button>\
-    </div>\
-    ').insertAfter($placeOrderBtn);
-
-    $moneiPlaceOrderBtnContainer.on('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-
-        if (!$('.monei-button').prop('disabled')) {
-            currentlyCalling = true;
-            $('body').trigger('checkout:disableButton', '.next-step-button button');
-            createOrderAsync();
-        }
-    });
-    $moneiPlaceOrderBtnContainer.hide();
-}
-
-/**
- * Switch checkout place order button depending on selected payment method
- *
- * @return {Void}
- */
 function switchPlaceOrderBtn() {
-    // TODO
     var $placeOrderBtn = $('.place-order');
     var $moneiPlaceOrderBtn = $('.monei-place-order');
-    var $mpPlaceOrderBtn = $('.mercadopago-place-order');
-    var $klarnaPlaceOrderBtn = $('.klarna-place-order');
     var currentStage = $('.data-checkout-stage').attr('data-checkout-stage');
 
-    if (currentStage == 'placeOrder' || currentStage == 'submitted') {
+    if (currentStage === 'placeOrder' || currentStage === 'submitted') {
         var $selectedPaymentOptionEl = $('.payment-information .nav-link.active').closest('li');
         var selectedPaymentOptionId = $selectedPaymentOptionEl.attr('data-method-id');
-        if (selectedPaymentOptionId == null) {
-            if ($('[name="async_selected_payment"]').length > 0) {
-                selectedPaymentOptionId = $('[name="async_selected_payment"]').val();
-            } else {
-                selectedPaymentOptionId = '';
-            }
-        }
 
         if (selectedPaymentOptionId.toLowerCase().indexOf('monei') > -1) {
             $moneiPlaceOrderBtn.show();
@@ -198,117 +153,43 @@ function switchPlaceOrderBtn() {
             }
             $placeOrderBtn.hide();
             $placeOrderBtn.prop('disabled', true);
-            if ($klarnaPlaceOrderBtn.length > 0) {
-                $klarnaPlaceOrderBtn.hide();
-                $klarnaPlaceOrderBtn.prop('disabled', true);
-            }
-            if ($mpPlaceOrderBtn.length > 0) {
-                $mpPlaceOrderBtn.hide();
-                $mpPlaceOrderBtn.prop('disabled', true);
-            }
-        } else if (selectedPaymentOptionId.toLowerCase().indexOf('klarna') > -1) {
-            $moneiPlaceOrderBtn.hide();
-            $moneiPlaceOrderBtn.find('.monei-button').prop('disabled', true);
-            $placeOrderBtn.hide();
-            $placeOrderBtn.prop('disabled', true);
-
-            if ($klarnaPlaceOrderBtn.length > 0) {
-                $klarnaPlaceOrderBtn.show();
-                $klarnaPlaceOrderBtn.prop('disabled', false);
-            }
-            if ($mpPlaceOrderBtn.length > 0) {
-                $mpPlaceOrderBtn.hide();
-                $mpPlaceOrderBtn.prop('disabled', true);
-            }
-        } else if (selectedPaymentOptionId.toLowerCase().indexOf('mercadopago') > -1) {
-            $moneiPlaceOrderBtn.hide();
-            $moneiPlaceOrderBtn.find('.mercadopago-button').prop('disabled', true);
-            $placeOrderBtn.hide();
-            $placeOrderBtn.prop('disabled', true);
-            $mpPlaceOrderBtn.show();
-            $mpPlaceOrderBtn.prop('disabled', false);
-
-            if ($klarnaPlaceOrderBtn.length > 0) {
-                $klarnaPlaceOrderBtn.hide();
-                $klarnaPlaceOrderBtn.prop('disabled', true);
-            }
         } else {
             $placeOrderBtn.show();
             $placeOrderBtn.prop('disabled', false);
             $moneiPlaceOrderBtn.hide();
             $moneiPlaceOrderBtn.find('.monei-button').prop('disabled', true);
-
-            if ($klarnaPlaceOrderBtn.length > 0) {
-                $klarnaPlaceOrderBtn.hide();
-                $klarnaPlaceOrderBtn.prop('disabled', true);
-            }
-            if ($mpPlaceOrderBtn.length > 0) {
-                $mpPlaceOrderBtn.hide();
-                $mpPlaceOrderBtn.prop('disabled', true);
-            }
         }
     } else {
         $moneiPlaceOrderBtn.hide();
     }
 }
 
-function moneiComponentConfirmPayment(token, paymentId, orderId) {
-    monei.confirmPayment({
-        paymentId: paymentId, 
-        paymentToken: token
-    }).then(function (result) {
-        if (result && result.status && confirmationPaymentErrorStatus.indexOf(result.status) > -1) { 
-            failCreatedOrderAsync(orderId, true);
-        } else {
-            placeCreatedOrderAsync(result, orderId);
-        }
-        
-    }).catch(function () {
-        failCreatedOrderAsync(orderId, true);
-    });
-}
-
-/**
- * Makes ajax call to createOrder endpoint
- *
- * @return {Void}
- */
-function createOrderAsync() {
-    if ($('[name="monei_createOrderEndpoint"]').length > 0) {
-        $('body').trigger('checkout:disableButton', '.next-step-button button');
+function failCreatedOrderAsync(orderId, restoreBasket) {
+    if ($('[name="monei_failOrderEndpoint"]').length > 0) {
         $.ajax({
-            url: $('[name="monei_createOrderEndpoint"]').val(),
+            url: $('[name="monei_failOrderEndpoint"]').val(),
             method: 'POST',
+            data: {
+                orderId: orderId,
+                restoreBasket: restoreBasket
+            },
             success: function (data) {
-                if (data.error) {
-                    if (data.redirectUrl) {
-                        window.location.href = data.redirectUrl;
-                    }
-                    if (data.errorMessage) {
-                        $('body').trigger('checkout:enableButton', '.next-step-button button');
-                        if ($('.error-message').length > 0) {
-                            $('.error-message').show();
-                            $('.error-message-text').text(data.errorMessage);
-                        }
-                    }
+                if (!data.error && data.redirectUrl) {
+                    window.location.href = data.redirectUrl;
                 } else {
-                    if (typeof data.orderMoneiToken !== 'undefined' && typeof data.orderMoneiPaymentId !== 'undefined') {
-                        moneiComponentConfirmPayment(data.orderMoneiToken, data.orderMoneiPaymentId, data.orderId);
-                    }
+                    window.location.href = $('[name="monei_cartEndpoint"]').val();
                 }
             },
             error: function () {
+                window.location.href = $('[name="monei_cartEndpoint"]').val();
+            },
+            complete: function () {
                 $('body').trigger('checkout:enableButton', '.next-step-button button');
             }
         });
     }
 }
 
-/**
- * Makes ajax call to placeOrder endpoint
- *
- * @return {Void}
- */
 function placeCreatedOrderAsync(result, orderId) {
     if ($('[name="monei_placeOrderEndpoint"]').length > 0) {
         $.ajax({
@@ -347,49 +228,78 @@ function placeCreatedOrderAsync(result, orderId) {
     }
 }
 
-/**
- * Makes ajax call to failOrder endpoint
- *
- * @return {Void}
- */
-function failCreatedOrderAsync(orderId, restoreBasket) {
-    if ($('[name="monei_failOrderEndpoint"]').length > 0) {
+function moneiComponentConfirmPayment(token, paymentId, orderId) {
+    monei.confirmPayment({
+        paymentId: paymentId,
+        paymentToken: token
+    }).then(function (result) {
+        if (result && result.status && confirmationPaymentErrorStatus.indexOf(result.status) > -1) {
+            failCreatedOrderAsync(orderId, true);
+        } else {
+            placeCreatedOrderAsync(result, orderId);
+        }
+    }).catch(function () {
+        failCreatedOrderAsync(orderId, true);
+    });
+}
+
+function createOrderAsync() {
+    if ($('[name="monei_createOrderEndpoint"]').length > 0) {
+        $('body').trigger('checkout:disableButton', '.next-step-button button');
         $.ajax({
-            url: $('[name="monei_failOrderEndpoint"]').val(),
+            url: $('[name="monei_createOrderEndpoint"]').val(),
             method: 'POST',
-            data: {
-                orderId: orderId,
-                restoreBasket: restoreBasket
-            },
             success: function (data) {
-                console.log(data)
-                if (!data.error && data.redirectUrl) {
-                    window.location.href = data.redirectUrl;
-                } else {
-                    window.location.href = $('[name="monei_cartEndpoint"]').val();
+                if (data.error) {
+                    if (data.redirectUrl) {
+                        window.location.href = data.redirectUrl;
+                    }
+                    if (data.errorMessage) {
+                        $('body').trigger('checkout:enableButton', '.next-step-button button');
+                        if ($('.error-message').length > 0) {
+                            $('.error-message').show();
+                            $('.error-message-text').text(data.errorMessage);
+                        }
+                    }
+                } else if (typeof data.orderMoneiToken !== 'undefined' && typeof data.orderMoneiPaymentId !== 'undefined') {
+                    moneiComponentConfirmPayment(data.orderMoneiToken, data.orderMoneiPaymentId, data.orderId);
                 }
             },
             error: function () {
-                window.location.href = $('[name="monei_cartEndpoint"]').val();
-            },
-            complete: function () {
                 $('body').trigger('checkout:enableButton', '.next-step-button button');
             }
         });
     }
 }
 
-/**
- * Initialize Monei library
- *
- * @param {Object} config - configuration settings.
- * @return {Void}
- */
+function generatePlaceOrderButton() {
+    var $placeOrderBtn = $('.place-order');
+    var $moneiPlaceOrderBtnContainer = $('<div></div>');
+    var $moneiBtn = $('<button type="submit"></button>');
+    $moneiPlaceOrderBtnContainer.addClass('monei-place-order');
+    $moneiBtn.addClass('btn').addClass('btn-primary').addClass('monei-button');
+    $moneiBtn.text($('.place-order').text().trim().toString());
+    $moneiPlaceOrderBtnContainer.append($moneiBtn);
+    $moneiPlaceOrderBtnContainer.insertAfter($placeOrderBtn);
+
+    $moneiPlaceOrderBtnContainer.on('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (!$('.monei-button').prop('disabled')) {
+            currentlyCalling = true;
+            $('body').trigger('checkout:disableButton', '.next-step-button button');
+            createOrderAsync();
+        }
+    });
+    $moneiPlaceOrderBtnContainer.hide();
+}
+
 var initMonei = function () {
     var iteration = 0;
-    var moneiInterval = setInterval(function() {
-        if (typeof monei !== "undefined") {
-            if ($(".monei-content").length > 0) {
+    var moneiInterval = setInterval(function () {
+        if (typeof monei !== 'undefined') {
+            if ($('.monei-content').length > 0) {
                 getOrderData();
                 clearInterval(moneiInterval);
             }

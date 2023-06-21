@@ -9,7 +9,7 @@ function OrderModel(lineItemContainer, options) {
         this.moneiOrderData = null;
     } else {
         this.moneiOrderData = {
-            amount: Math.round( lineItemContainer.getTotalGrossPrice().value * 100 ),
+            amount: Math.round(lineItemContainer.getTotalGrossPrice().value * 100),
             currency: lineItemContainer.currencyCode
         };
     }

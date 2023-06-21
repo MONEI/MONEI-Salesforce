@@ -1,6 +1,5 @@
 'use strict';
 
-var Resource = require('dw/web/Resource');
 var Locale = require('dw/util/Locale');
 var OrderMgr = require('dw/order/OrderMgr');
 var moneiHelper = require('*/cartridge/scripts/helpers/moneiHelper');
@@ -9,26 +8,25 @@ var URLUtils = require('dw/web/URLUtils');
 var server = require('server');
 
 server.post('orderData', function (req, res, next) {
-	var BasketMgr = require('dw/order/BasketMgr');
-    var Locale = require('dw/util/Locale');
+    var BasketMgr = require('dw/order/BasketMgr');
     var OrderModel = require('*/cartridge/models/order');
 
     var currentLocale = Locale.getLocale(req.locale.id);
 
-	var currentBasket = BasketMgr.getCurrentBasket();
-	var orderModel = new OrderModel(
+    var currentBasket = BasketMgr.getCurrentBasket();
+    var orderModel = new OrderModel(
         currentBasket,
-        { 
-            countryCode: currentLocale.country,  
-            containerView: 'basket' 
+        {
+            countryCode: currentLocale.country,
+            containerView: 'basket'
         }
     );
 
     res.json({
         order: orderModel
-    })
+    });
 
-	next();
+    next();
 });
 
 server.post('createOrder', function (req, res, next) {
@@ -50,7 +48,7 @@ server.post('createOrder', function (req, res, next) {
         orderMoneiPaymentId: result.orderMoneiPaymentId ? result.orderMoneiPaymentId : null
     });
 
-	next();
+    next();
 });
 
 server.post('placeOrder', function (req, res, next) {
@@ -83,7 +81,7 @@ server.post('placeOrder', function (req, res, next) {
         continueUrl: URLUtils.url('Order-Confirm').toString()
     });
 
-	next();
+    next();
 });
 
 server.post('failOrder', function (req, res, next) {
@@ -103,7 +101,7 @@ server.post('failOrder', function (req, res, next) {
         redirectUrl: URLUtils.url('Checkout-Begin', 'showMoneiError', true, 'stage', 'payment').toString()
     });
 
-	next();
+    next();
 });
 
 server.post('Callback', function (req, res, next) {

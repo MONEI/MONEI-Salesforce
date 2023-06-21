@@ -5,47 +5,14 @@ var Order = require('dw/order/Order');
 var Resource = require('dw/web/Resource');
 var Transaction = require('dw/system/Transaction');
 var moneiPreferences = require('*/cartridge/config/moneiPreferences');
-
-function updateNotifiedOrder(result, currentLocale) {
-    if (!empty(result)) {
-        if (Object.prototype.hasOwnProperty.call(result, 'orderId') && Object.prototype.hasOwnProperty.call(result, 'status')) {
-            var notifiedStatus = result.status;
-            var orderId = result.orderId;
-            var order = OrderMgr.getOrder(orderId);
-            var result;
-
-            if (order) {
-                if (status === moneiPreferences.status.CANCELLED || status === moneiPreferences.status.FAILED || status === moneiPreferences.status.EXPIRED) {
-                    result = cancelOrFailOrder(order, false);
-
-                    if (!result) {
-                        createErrorLog('Notification on order ' + orderId + ' attempted cancellation but returned error');
-                    }
-                } else if (status === moneiPreferences.status.PENDING || status === moneiPreferences.status.SUCCEEDED) {
-                    result = placeOrder(order, currentLocale, null, false);
-
-                    if (result.error) {
-                        createErrorLog('Notification on order ' + orderId + ' attempted cancellation but returned error');
-                    }
-                } else if (status === moneiPreferences.status.AUTHORIZED) {
-                    result = placeOrder(order, currentLocale, status, false);
-
-                    if (result.error) {
-                        createErrorLog('Notification on order ' + orderId + ' attempted placing and update but returned error');
-                    }
-                }
-            } else {
-                createErrorLog('Notified order not found: ' + orderId)
-            }
-        }
-    }
-}
+var moneiHelper = require('*/cartridge/scripts/helpers/moneiHelper');
 
 function createOrder(req, currentBasket) {
     var basketCalculationHelpers = require('*/cartridge/scripts/helpers/basketCalculationHelpers');
     var hooksHelper = require('*/cartridge/scripts/helpers/hooks');
     var COHelpers = require('*/cartridge/scripts/checkout/checkoutHelpers');
     var validationHelpers = require('*/cartridge/scripts/helpers/basketValidationHelpers');
+    var URLUtils = require('dw/web/URLUtils');
 
     var result = {
         error: true,
@@ -123,7 +90,7 @@ function cancelOrFailOrder(order, restoreBasket) {
     var error = true;
 
     if (order) {
-        if (order.getStatus() == Order.ORDER_STATUS_CREATED) {
+        if (order.getStatus() === Order.ORDER_STATUS_CREATED) {
             var BasketMgr = require('dw/order/BasketMgr');
             Transaction.wrap(function () {
                 order.addNote('Monei', 'failing order');
@@ -152,14 +119,14 @@ function undoCancelOrFailOrder(order) {
     var error = true;
 
     if (!empty(order)) {
-        if (order.getStatus() == Order.ORDER_STATUS_FAILED) {
+        if (order.getStatus() === Order.ORDER_STATUS_FAILED) {
             Transaction.wrap(function () {
                 order.addNote('Monei', 'undoing fail order');
                 OrderMgr.undoFailOrder(order);
                 error = false;
             });
         }
-        if (order.getStatus() == Order.ORDER_STATUS_CANCELLED) {
+        if (order.getStatus() === Order.ORDER_STATUS_CANCELLED) {
             Transaction.wrap(function () {
                 order.addNote('Monei', 'undoing cancel order');
                 OrderMgr.undoCancelOrder(order);
@@ -173,14 +140,12 @@ function undoCancelOrFailOrder(order) {
 
 function placeOrder(order, currentLocale, paymentResult, restoreBasket) {
     var COHelpers = require('*/cartridge/scripts/checkout/checkoutHelpers');
-    var URLUtils = require('dw/web/URLUtils');
     var hooksHelper = require('*/cartridge/scripts/helpers/hooks');
 
     if (order) {
         undoCancelOrFailOrder(order);
 
-        if (order.getStatus() == Order.ORDER_STATUS_CREATED) {
-            // Handles payment authorization
+        if (order.getStatus() === Order.ORDER_STATUS_CREATED) {
             var handlePaymentResult = COHelpers.handlePayments(order, order.orderNo);
             if (handlePaymentResult.error) {
                 return {
@@ -216,6 +181,41 @@ function placeOrder(order, currentLocale, paymentResult, restoreBasket) {
     return {
         error: false
     };
+}
+
+function updateNotifiedOrder(response, currentLocale) {
+    if (!empty(response)) {
+        if (Object.prototype.hasOwnProperty.call(response, 'orderId') && Object.prototype.hasOwnProperty.call(response, 'status')) {
+            var notifiedStatus = response.status;
+            var orderId = response.orderId;
+            var order = OrderMgr.getOrder(orderId);
+            var result;
+
+            if (order) {
+                if (notifiedStatus === moneiPreferences.status.CANCELLED || notifiedStatus === moneiPreferences.status.FAILED || notifiedStatus === moneiPreferences.status.EXPIRED) {
+                    result = cancelOrFailOrder(order, false);
+
+                    if (!result) {
+                        moneiHelper.createErrorLog('Notification on order ' + orderId + ' attempted cancellation but returned error');
+                    }
+                } else if (status === moneiPreferences.status.PENDING || status === moneiPreferences.status.SUCCEEDED) {
+                    result = placeOrder(order, currentLocale, null, false);
+
+                    if (result.error) {
+                        moneiHelper.createErrorLog('Notification on order ' + orderId + ' attempted cancellation but returned error');
+                    }
+                } else if (status === moneiPreferences.status.AUTHORIZED) {
+                    result = placeOrder(order, currentLocale, status, false);
+
+                    if (result.error) {
+                        moneiHelper.createErrorLog('Notification on order ' + orderId + ' attempted placing and update but returned error');
+                    }
+                }
+            } else {
+                moneiHelper.createErrorLog('Notified order not found: ' + orderId);
+            }
+        }
+    }
 }
 
 module.exports = {

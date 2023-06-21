@@ -1,11 +1,7 @@
 'use strict';
 
-/**
- * simple hook for bizum processing
- * @return {Object} an object that contains standard valid information
- */
 function processForm(req, paymentForm, viewFormData) {
-	var viewData = viewFormData;
+    var viewData = viewFormData;
 
     viewData.paymentMethod = {
         value: paymentForm.paymentMethod.value,
@@ -32,8 +28,8 @@ function processForm(req, paymentForm, viewFormData) {
     };
 
     return {
-    	error: false,
-    	viewData: viewData
+        error: false,
+        viewData: viewData
     };
 }
 
