@@ -86,29 +86,26 @@ function createOrder(req, currentBasket) {
     return result;
 }
 
-function cancelOrFailOrder(order, restoreBasket) {
-    var error = true;
+function cancelOrFailOrder(order) {
+    var error = false;
 
     if (order) {
-        if (order.getStatus() === Order.ORDER_STATUS_CREATED) {
-            var BasketMgr = require('dw/order/BasketMgr');
-            Transaction.wrap(function () {
-                order.addNote('Monei', 'failing order');
-                OrderMgr.failOrder(order, restoreBasket);
-                if (restoreBasket) {
-                    BasketMgr.createBasketFromOrder(order);
-                }
-                session.custom.moneiErrorMessage = Resource.msg('error.technical', 'checkout', null);
-                error = false;
-            });
-        }
-        if (order.getStatus() !== Order.ORDER_STATUS_CREATED && order.getStatus() !== Order.ORDER_STATUS_FAILED) {
-            Transaction.wrap(function () {
-                order.addNote('Monei', 'cancelling order');
-                OrderMgr.cancelOrder(order);
-                session.custom.moneiErrorMessage = Resource.msg('error.technical', 'checkout', null);
-                error = false;
-            });
+        if (order.getStatus() != Order.ORDER_STATUS_FAILED && order.getStatus() != Order.ORDER_STATUS_CANCELLED) {
+            if (order.getStatus() == Order.ORDER_STATUS_CREATED) {
+                Transaction.wrap(function () {
+                    order.addNote('Monei', 'failing order');
+                    OrderMgr.failOrder(order, true);
+                    session.custom.moneiErrorMessage = Resource.msg('error.technical', 'checkout', null);
+                });
+            } else if (order.getStatus() != Order.ORDER_STATUS_CREATED && order.getStatus() != Order.ORDER_STATUS_FAILED) {
+                Transaction.wrap(function () {
+                    order.addNote('Monei', 'cancelling order');
+                    OrderMgr.cancelOrder(order);
+                    session.custom.moneiErrorMessage = Resource.msg('error.technical', 'checkout', null);
+                });
+            } else {
+                error = true;
+            }
         }
     }
 
@@ -119,14 +116,14 @@ function undoCancelOrFailOrder(order) {
     var error = true;
 
     if (!empty(order)) {
-        if (order.getStatus() === Order.ORDER_STATUS_FAILED) {
+        if (order.getStatus() == Order.ORDER_STATUS_FAILED) {
             Transaction.wrap(function () {
                 order.addNote('Monei', 'undoing fail order');
                 OrderMgr.undoFailOrder(order);
                 error = false;
             });
         }
-        if (order.getStatus() === Order.ORDER_STATUS_CANCELLED) {
+        if (order.getStatus() == Order.ORDER_STATUS_CANCELLED) {
             Transaction.wrap(function () {
                 order.addNote('Monei', 'undoing cancel order');
                 OrderMgr.undoCancelOrder(order);
@@ -145,7 +142,7 @@ function placeOrder(order, currentLocale, paymentResult, restoreBasket) {
     if (order) {
         undoCancelOrFailOrder(order);
 
-        if (order.getStatus() === Order.ORDER_STATUS_CREATED) {
+        if (order.getStatus() == Order.ORDER_STATUS_CREATED) {
             var handlePaymentResult = COHelpers.handlePayments(order, order.orderNo);
             if (handlePaymentResult.error) {
                 return {
@@ -193,19 +190,19 @@ function updateNotifiedOrder(response, currentLocale) {
 
             if (order) {
                 if (notifiedStatus === moneiPreferences.status.CANCELLED || notifiedStatus === moneiPreferences.status.FAILED || notifiedStatus === moneiPreferences.status.EXPIRED) {
-                    result = cancelOrFailOrder(order, false);
+                    result = cancelOrFailOrder(order);
 
                     if (!result) {
                         moneiHelper.createErrorLog('Notification on order ' + orderId + ' attempted cancellation but returned error');
                     }
-                } else if (status === moneiPreferences.status.PENDING || status === moneiPreferences.status.SUCCEEDED) {
+                } else if (notifiedStatus === moneiPreferences.status.PENDING || notifiedStatus === moneiPreferences.status.SUCCEEDED) {
                     result = placeOrder(order, currentLocale, null, false);
 
                     if (result.error) {
                         moneiHelper.createErrorLog('Notification on order ' + orderId + ' attempted cancellation but returned error');
                     }
-                } else if (status === moneiPreferences.status.AUTHORIZED) {
-                    result = placeOrder(order, currentLocale, status, false);
+                } else if (notifiedStatus === moneiPreferences.status.AUTHORIZED) {
+                    result = placeOrder(order, currentLocale, notifiedStatus, false);
 
                     if (result.error) {
                         moneiHelper.createErrorLog('Notification on order ' + orderId + ' attempted placing and update but returned error');
