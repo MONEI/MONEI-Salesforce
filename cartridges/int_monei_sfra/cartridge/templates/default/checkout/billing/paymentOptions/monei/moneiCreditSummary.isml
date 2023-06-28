@@ -1,0 +1,24 @@
+<div>
+	<div class="monei-method-name">
+		<isprint value="${payment.paymentMethodName}" />
+	</div>
+	<isif condition="${payment.type}">
+		<div class="monei-card-type">
+				<span>${Resource.msg('msg.payment.type.credit', 'confirmation', null)}
+				${payment.type}</span>
+		</div>
+	</isif>
+	<isif condition="${payment.maskedCreditCardNumber}">
+			<div class="monei-card-number">
+					${payment.maskedCreditCardNumber}
+			</div>
+	</isif>
+	<isif condition="${payment.expirationMonth && payment.expirationYear}">
+			<div class="monei-card-expiration-date">
+					<span>${Resource.msg('msg.card.type.ending', 'confirmation', null)} ${payment.expirationMonth}/${payment.expirationYear}</span>
+			</div>
+	</isif>
+	<div class="monei-amount">
+		<isprint value="${payment.formattedAmount}" />
+	</div>
+</div>

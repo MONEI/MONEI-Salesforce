@@ -1,6 +1,7 @@
-/* global monei */
+/* global monei creditCustomStyles */
 
 var moneiOrderData = {};
+var credit;
 var bizum;
 var currentlyCalling = false;
 var confirmationPaymentErrorStatus = [
@@ -10,26 +11,25 @@ var confirmationPaymentErrorStatus = [
 ];
 
 function moneiTokenHandler(token) {
-    $("[name='dwfrm_billing_moneiPaymentFields_moneiToken']").val(token);
-    $("[name='dwfrm_billing_moneiPaymentFields_moneiAmount']").val(moneiOrderData.amount);
-    $("[name='dwfrm_billing_moneiPaymentFields_moneiCurrency']").val(moneiOrderData.currency);
-
-    $('.submit-payment').trigger('click');
+    $('[name="dwfrm_billing_moneiPaymentFields_moneiToken"]').val(token);
+    $('[name="dwfrm_billing_moneiPaymentFields_moneiAmount"]').val(moneiOrderData.amount);
+    $('[name="dwfrm_billing_moneiPaymentFields_moneiCurrency"]').val(moneiOrderData.currency);
 }
 
-function initBizumButton() {
+function initBizum() {
     if (bizum) {
         bizum.close();
     }
 
     bizum = monei.Bizum({ // eslint-disable-new-cap
-        accountId: $("[name='monei_id']").val(),
-        sessionId: $("[name='dwfrm_billing_moneiPaymentFields_moneiSessionID']").val(),
+        accountId: $('[name="monei_id"]').val(),
+        sessionId: $('[name="dwfrm_billing_moneiPaymentFields_moneiSessionID"]').val(),
         amount: moneiOrderData.amount,
         currency: moneiOrderData.currency,
-        language: $("[name='monei_lang']").val(),
+        language: $('[name="monei_lang"]').val(),
         onSubmit(result) {
             moneiTokenHandler(result.token);
+            $('.submit-payment').trigger('click');
         },
         onError(error) {
             $('.monei-error').html(error);
@@ -37,6 +37,91 @@ function initBizumButton() {
         }
     });
     bizum.render('#monei-bizum-content .monei-bizum-button-container');
+}
+
+function initCredit() {
+    if (credit) {
+        credit.close();
+    }
+
+    credit = monei.CardInput({ // eslint-disable-new-cap
+        accountId: $('[name="monei_id"]').val(),
+        sessionId: $('[name="dwfrm_billing_moneiPaymentFields_moneiSessionID"]').val(),
+        language: $('[name="monei_lang"]').val(),
+        style: typeof creditCustomStyles !== 'undefined' ? creditCustomStyles : null,
+        onFocus: function () {
+            $('#monei-credit-content .monei-credit-card-input').addClass('is-focused');
+        },
+        onBlur: function () {
+            $('#monei-credit-content .monei-credit-card-input').removeClass('is-focused');
+        },
+        onChange: function (event) {
+            if (event.isTouched && event.error) {
+                $('#monei-credit-content .monei-credit-card-input').addClass('is-invalid');
+                $('#monei-credit-content .monei-error').html(event.error);
+            } else {
+                $('#monei-credit-content .monei-credit-card-input').removeClass('is-invalid');
+                $('#monei-credit-content .monei-error').html('');
+            }
+        }
+    });
+    credit.render('#monei-credit-content .monei-credit-card-input');
+}
+
+function manageCreditForm () {
+    $('#monei-credit-content .monei-credit-name-input input').off('focus').on('focus', function() {
+        $('#monei-credit-content .monei-credit-name-input').addClass('is-focused');
+    });
+    $('#monei-credit-content .monei-credit-name-input input').off('blur').on('blur', function() {
+        $('#monei-credit-content .monei-credit-name-input').removeClass('is-focused');
+    });
+    $('#monei-credit-content .monei-credit-name-input input').off('change.validation blur.validation').on('change.validation blur.validation', function() {
+        if ($('#monei-credit-content .monei-credit-name-input input').val() === "") {
+            $('#monei-credit-content .monei-credit-name-input').addClass('is-invalid');
+            $('#monei-credit-content .monei-error').html($('#monei-credit-content .monei-credit-name-input input').data('missing-error'));
+        } else {
+            $('#monei-credit-content .monei-credit-name-input').removeClass('is-invalid');
+            $('#monei-credit-content .monei-error').html('');
+        }
+    });
+
+    $('button.submit-payment').off('click.ccard').on('click.ccard', function (e) {
+        var moneyPaymentMethod = window.localStorage.getItem('monei_card_payment');
+        if (credit) {
+            var activeTabId = $('.tab-pane.active').attr('id');
+            var paymentInfoSelector = '#dwfrm_billing .' + activeTabId + ' .payment-form-fields input.form-control';
+            var selectedPaymentMethod = $(paymentInfoSelector).val();
+
+            if (selectedPaymentMethod === 'MONEI_CREDIT' && !moneyPaymentMethod) {
+                e.stopImmediatePropagation();
+                window.localStorage.setItem('monei_card_payment', true);
+
+                if ($('#monei-credit-content .monei-credit-name-input input').val() == '') {
+                    $('#monei-credit-content .monei-credit-name-input').addClass('is-invalid');
+                    $('#monei-credit-content .monei-error').html($('#monei-credit-content .monei-credit-name-input input').data('missing-error'));
+                    window.localStorage.removeItem('monei_card_payment');
+                    return;
+                }
+
+                $('body').trigger('checkout:disableButton', '.next-step-button button');
+
+                monei.createToken(credit).then(function (result) {
+                    if (result.error) {
+                        $('#monei-credit-content .monei-credit-card-input').addClass('is-invalid');
+                        $('#monei-credit-content .monei-error').html(result.error);
+                    } else {
+                        moneiTokenHandler(result.token);
+                        $('body').trigger('checkout:enableButton', '.next-step-button button');
+                        $('.submit-payment').click();
+                    }
+                })
+                .catch(function () {
+                    window.localStorage.removeItem('monei_card_payment');
+                    $('body').trigger('checkout:enableButton', '.next-step-button button');
+                });
+            }
+        }
+    });
 }
 
 function ensureMoneiContentVisibility() {
@@ -52,10 +137,13 @@ function ensureMoneiContentVisibility() {
     }
 }
 
-
 function renderMoneiComponents() {
     if ($('#monei-bizum-content').length > 0) {
-        initBizumButton();
+        initBizum();
+    }
+    if ($('#monei-credit-content').length > 0) {
+        initCredit();
+        manageCreditForm();
     }
 }
 
@@ -76,9 +164,11 @@ function managePaymentSelections() {
 
         setTimeout(function () {
             var $submitPaymentBtn = $('.submit-payment');
-            var currentPaymentId = $(e.target).parent().attr('data-method-id').toLowerCase();
-            if (currentPaymentId.indexOf('monei') > -1) {
-                $submitPaymentBtn.hide();
+            if ($(e.target).hasClass('active')) {
+                var currentPaymentId = $(e.target).parent().attr('data-method-id').toLowerCase();
+                if (currentPaymentId.indexOf('monei_bizum') > -1) {
+                    $submitPaymentBtn.hide();
+                }
             }
         }, 100);
     });
@@ -315,8 +405,10 @@ var initMonei = function () {
     generatePlaceOrderButton();
     switchPlaceOrderBtn();
     managePaymentSelections();
+    window.localStorage.removeItem('monei_card_payment');
 
     $('body').on('checkout:updateCheckoutView', function (e, data) {
+        window.localStorage.removeItem('monei_card_payment');
         if (checkOrderDataForRendering(data.order)) {
             renderMoneiComponents();
         }

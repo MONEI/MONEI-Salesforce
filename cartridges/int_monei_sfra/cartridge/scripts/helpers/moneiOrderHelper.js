@@ -135,7 +135,7 @@ function undoCancelOrFailOrder(order) {
     return error;
 }
 
-function placeOrder(order, currentLocale, paymentResult, restoreBasket) {
+function placeOrder(order, currentLocale, paymentResult, paymentMethod, restoreBasket) {
     var COHelpers = require('*/cartridge/scripts/checkout/checkoutHelpers');
     var hooksHelper = require('*/cartridge/scripts/helpers/hooks');
 
@@ -174,6 +174,23 @@ function placeOrder(order, currentLocale, paymentResult, restoreBasket) {
                 order.setPaymentStatus(Order.PAYMENT_STATUS_PAID);
             });
         }
+
+        if (paymentMethod.method == 'card' && Object.prototype.hasOwnProperty.call(paymentMethod, 'card')) {
+            Transaction.wrap(function () {
+                if (Object.prototype.hasOwnProperty.call(paymentMethod.card, 'brand')) {
+                    order.paymentInstrument.setCreditCardType(paymentMethod.card.brand);
+                }
+                if (Object.prototype.hasOwnProperty.call(paymentMethod.card, 'last4')) {
+                    order.paymentInstrument.setCreditCardNumber(paymentMethod.card.last4);
+                }
+                if (Object.prototype.hasOwnProperty.call(paymentMethod.card, 'expiration')) {
+                    var expDate = new Date(0);
+                    expDate.setUTCSeconds(paymentMethod.card.expiration);
+                    order.paymentInstrument.setCreditCardExpirationMonth(expDate.getMonth() + 1);
+                    order.paymentInstrument.setCreditCardExpirationYear(expDate.getYear());
+                }
+            });
+        }
     }
     return {
         error: false
@@ -185,6 +202,7 @@ function updateNotifiedOrder(response, currentLocale) {
         if (Object.prototype.hasOwnProperty.call(response, 'orderId') && Object.prototype.hasOwnProperty.call(response, 'status')) {
             var notifiedStatus = response.status;
             var orderId = response.orderId;
+            var paymentMethod = response.paymentMethod;
             var order = OrderMgr.getOrder(orderId);
             var result;
 
@@ -196,13 +214,13 @@ function updateNotifiedOrder(response, currentLocale) {
                         moneiHelper.createErrorLog('Notification on order ' + orderId + ' attempted cancellation but returned error');
                     }
                 } else if (notifiedStatus === moneiPreferences.status.PENDING || notifiedStatus === moneiPreferences.status.SUCCEEDED) {
-                    result = placeOrder(order, currentLocale, null, false);
+                    result = placeOrder(order, currentLocale, null, paymentMethod, false);
 
                     if (result.error) {
                         moneiHelper.createErrorLog('Notification on order ' + orderId + ' attempted cancellation but returned error');
                     }
                 } else if (notifiedStatus === moneiPreferences.status.AUTHORIZED) {
-                    result = placeOrder(order, currentLocale, notifiedStatus, false);
+                    result = placeOrder(order, currentLocale, notifiedStatus, paymentMethod, false);
 
                     if (result.error) {
                         moneiHelper.createErrorLog('Notification on order ' + orderId + ' attempted placing and update but returned error');

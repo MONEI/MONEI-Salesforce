@@ -1,7 +1,19 @@
-.card-input {
-    .form-control {
-        padding: 0;
-        background-image: none;
+.monei-credit-input-container {
+    .monei-input {
+        input {
+            padding: 12px 6px;
+            border: 1px solid #ced4da;
+            color: #495057;
+
+            &::placeholder {
+                color: #495057;
+            }
+        }
+
+        &.monei-credit-card-input {
+            border: 1px solid #ced4da;
+            margin: 15px 0;
+        }
 
         &.is-focused {
             color: #495057;
@@ -11,14 +23,24 @@
             box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
         }
 
-        &.is-invalid.is-focused {
+        &.is-invalid {
             border-color: #dc3545;
             box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+
+            &.is-focused {
+                border-color: #dc3545;
+                box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+            }
         }
 
-        &.is-valid.is-focused {
+        &.is-valid {
             border-color: #28a745;
             box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+
+            &.is-focused {
+                border-color: #28a745;
+                box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+            }
         }
     }
 }
