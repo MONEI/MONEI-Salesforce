@@ -1,6 +1,14 @@
 {
     "hooks": [
         {
+            "name": "app.payment.form.processor.monei_credit",
+            "script": "./cartridge/scripts/hooks/payment/processor/credit/monei_form_processor"
+        },
+        {
+            "name": "app.payment.processor.monei_credit",
+            "script": "./cartridge/scripts/hooks/payment/processor/credit/monei_processor"
+        },
+        {
             "name": "app.payment.form.processor.monei_bizum",
             "script": "./cartridge/scripts/hooks/payment/processor/bizum/monei_form_processor"
         },

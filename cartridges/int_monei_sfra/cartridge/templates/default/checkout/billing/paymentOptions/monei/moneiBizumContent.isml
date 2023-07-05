@@ -1,4 +1,4 @@
-<div class="tab-pane active monei-bizum-content monei-content" id="monei-bizum-content" role="tabpanel">
+<div class="tab-pane monei-bizum-content monei-content" id="monei-bizum-content" role="tabpanel">
     <fieldset class="payment-form-fields">
         <isif condition="${pdict.monei.error !=null}">
             <div class="monei-error">

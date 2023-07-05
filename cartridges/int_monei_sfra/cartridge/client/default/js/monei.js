@@ -1,4 +1,5 @@
+var processInclude = require('base/util');
+
 $(document).ready(function () {
-    var moneyCheckout = require('./monei/moneiCheckout');
-    moneyCheckout.initMoney();
+    processInclude(require('./monei/moneiCheckout'));
 });
