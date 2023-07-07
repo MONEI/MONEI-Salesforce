@@ -9,13 +9,13 @@
 </isif>
 
 <isloop items="${pdict.order.billing.payment.applicablePaymentMethods}" var="paymentOption">
-    <isif condition="${paymentOption.ID === 'CREDIT_CARD'}">
-        <isinclude template="checkout/billing/paymentOptions/creditCardContent" />
-    </isif>
-    <isif condition="${paymentOption.ID === 'MONEI_CREDIT'}">
-        <isinclude template="checkout/billing/paymentOptions/monei/moneiCreditContent" />
+    <isif condition="${paymentOption.ID === 'MONEI_CARD'}">
+        <isinclude template="checkout/billing/paymentOptions/monei/moneiCardContent" />
     </isif>
     <isif condition="${paymentOption.ID === 'MONEI_BIZUM'}">
         <isinclude template="checkout/billing/paymentOptions/monei/moneiBizumContent" />
+    </isif>
+    <isif condition="${paymentOption.ID === 'CREDIT_CARD'}">
+        <isinclude template="checkout/billing/paymentOptions/creditCardContent" />
     </isif>
 </isloop>

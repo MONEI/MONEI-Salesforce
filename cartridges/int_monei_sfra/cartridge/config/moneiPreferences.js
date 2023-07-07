@@ -62,7 +62,7 @@ function getPreferences() {
         sessionId: generateSessionUniqueID(),
         paymentPageType: site.getCustomPreferenceValue('MONEI_API_Type_Page').getValue(),
         urlMoneiClientPlugin: site.getCustomPreferenceValue('MONEI_Plugin_Url').toString(),
-        creditStyles: site.getCustomPreferenceValue('MONEI_Credit_Styles').toString()
+        cardStyles: !empty(site.getCustomPreferenceValue('MONEI_Card_Styles')) ? site.getCustomPreferenceValue('MONEI_Card_Styles').toString() : ''
     };
 }
 

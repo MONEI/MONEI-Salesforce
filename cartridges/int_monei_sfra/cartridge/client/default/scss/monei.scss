@@ -1,4 +1,4 @@
-.monei-credit-input-container {
+.monei-card-input-container {
     .monei-input {
         input {
             padding: 12px 6px;
@@ -10,7 +10,7 @@
             }
         }
 
-        &.monei-credit-card-input {
+        &.monei-card-input {
             border: 1px solid #ced4da;
             margin: 15px 0;
         }
@@ -42,6 +42,10 @@
                 box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
             }
         }
+    }
+
+    .monei-card-input {
+        background-color: #FFFFFF;
     }
 }
 
@@ -103,6 +107,22 @@
         &:focus {
             box-shadow: 0 0 0 0.2rem rgba(155, 121, 179, 0.5);
         }
+    }
+}
+
+.monei-tab {
+    img {
+        width: 80px;
+        margin-right: 20px;
+    }
+}
+
+.monei-place-order {
+    display: block;
+    width: 100%;
+
+    button {
+        width: 100%;
     }
 }
 

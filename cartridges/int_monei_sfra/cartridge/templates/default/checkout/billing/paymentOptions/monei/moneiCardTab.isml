@@ -1,0 +1,11 @@
+<li class="nav-item" data-method-id="${paymentOption.ID}">
+    <a class="nav-link monei-card-tab monei-tab active" data-toggle="tab" href="#monei-card-content" role="tab">
+        <img class="card-option"
+                src="${URLUtils.staticURL('/images/logo_MONEI.svg')}"
+                height="32"
+                alt="${Resource.msg("monei.card.paymentname", "monei", null)}"
+                title="${Resource.msg("monei.card.paymentname", "monei", null)}"
+        >
+        ${Resource.msg("monei.card.paymentname", "monei", null)}
+    </a>
+</li>

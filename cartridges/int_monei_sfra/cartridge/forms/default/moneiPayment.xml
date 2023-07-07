@@ -5,6 +5,6 @@
 	<field formid="moneiCurrency" type="string" mandatory="false" />
 	<field formid="moneiSessionID" type="string" mandatory="false" />
 
-	<field formid="cardOwner" label="label.input.creditcard.owner" type="string" mandatory="false" binding="cardOwner"
+	<field formid="cardOwner" label="label.input.card.owner" type="string" mandatory="false" binding="cardOwner"
            max-length="22" missing-error="error.message.required"/>
 </form>

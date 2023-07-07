@@ -4,13 +4,13 @@
 	</div>
 	<isif condition="${payment.type}">
 		<div class="monei-card-type">
-				<span>${Resource.msg('msg.payment.type.credit', 'confirmation', null)}
+				<span>${Resource.msg('msg.payment.type.card', 'confirmation', null)}
 				${payment.type}</span>
 		</div>
 	</isif>
-	<isif condition="${payment.maskedCreditCardNumber}">
+	<isif condition="${payment.maskedcardCardNumber}">
 			<div class="monei-card-number">
-					${payment.maskedCreditCardNumber}
+					${payment.maskedcardCardNumber}
 			</div>
 	</isif>
 	<isif condition="${payment.expirationMonth && payment.expirationYear}">
