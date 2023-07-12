@@ -334,7 +334,8 @@ function placeCreatedOrderAsync(result, orderId) {
 function moneiComponentConfirmPayment(data) {
     var payload = {
         paymentId: data.orderMoneiPaymentId,
-        paymentToken: data.orderMoneiToken
+        paymentToken: data.orderMoneiToken,
+        language: $('[name="monei_lang"]').val()
     }
     console.log(data)
     if (Object.hasOwnProperty.call(data, 'orderMoneiCreditCardHolder') && data.orderMoneiCreditCardHolder) {
