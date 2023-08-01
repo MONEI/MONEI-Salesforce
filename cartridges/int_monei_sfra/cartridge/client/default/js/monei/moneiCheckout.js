@@ -3,6 +3,7 @@
 var moneiOrderData = {};
 var credit;
 var bizum;
+var paymentrequest;
 var currentlyCalling = false;
 var confirmationPaymentErrorStatus = [
     'FAILED',
@@ -66,6 +67,34 @@ function initCredit() {
         }
     });
     credit.render('#monei-credit-content .monei-credit-card-input');
+}
+
+function initPaymentrequest() {
+    if (paymentrequest) {
+        paymentrequest.close();
+    }
+
+    paymentrequest = monei.PaymentRequest({ // eslint-disable-new-cap
+        accountId: $('[name="monei_id"]').val(),
+        sessionId: $('[name="dwfrm_billing_moneiPaymentFields_moneiSessionID"]').val(),
+        amount: moneiOrderData.amount,
+        currency: moneiOrderData.currency,
+        language: $('[name="monei_lang"]').val(),
+        onSubmit(result) {
+            moneiTokenHandler(result.token);
+            $('.submit-payment').trigger('click');
+        },
+        onLoad(isSupported) {
+            if (!isSupported) {
+                $('.nav-item[data-method-id="MONEI_PAYMENTREQUEST"]').hide();
+            }
+        },
+        onError(error) {
+            $('.monei-error').html(error);
+            $('.monei-error').show();
+        }
+    });
+    paymentrequest.render('#monei-paymentrequest-content .monei-paymentrequest-button-container');
 }
 
 function manageCreditForm () {
@@ -145,6 +174,9 @@ function renderMoneiComponents() {
         initCredit();
         manageCreditForm();
     }
+    if ($('#monei-paymentrequest-content').length > 0) {
+        initPaymentrequest();
+    }
 }
 
 function managePaymentSelections() {
@@ -166,7 +198,7 @@ function managePaymentSelections() {
             var $submitPaymentBtn = $('.submit-payment');
             if ($(e.target).hasClass('active')) {
                 var currentPaymentId = $(e.target).parent().attr('data-method-id').toLowerCase();
-                if (currentPaymentId.indexOf('monei_bizum') > -1) {
+                if (currentPaymentId.indexOf('monei_bizum') > -1 || currentPaymentId.indexOf('monei_paymentrequest') > -1) {
                     $submitPaymentBtn.hide();
                 }
             }

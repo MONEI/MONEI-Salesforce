@@ -1,0 +1,16 @@
+<div class="tab-pane monei-paymentrequest-content monei-content" id="monei-paymentrequest-content" role="tabpanel">
+    <fieldset class="payment-form-fields">
+        <isif condition="${pdict.monei.error !=null}">
+            <div class="monei-error">
+                <isprint value="${pdict.monei.error}" encoding="on" />
+            </div>
+        </isif>
+        <input type="hidden" class="form-control" name="${pdict.forms.billingForm.paymentMethod.htmlName}" value="MONEI_PAYMENTREQUEST">
+        <input type="hidden" class="form-control" name="${pdict.forms.billingForm.moneiPaymentFields.moneiToken.htmlName}" value="" />
+        <input type="hidden" class="form-control" name="${pdict.forms.billingForm.moneiPaymentFields.moneiAmount.htmlName}" value="" />
+        <input type="hidden" class="form-control" name="${pdict.forms.billingForm.moneiPaymentFields.moneiCurrency.htmlName}" value="" />
+        <input type="hidden" class="form-control" name="${pdict.forms.billingForm.moneiPaymentFields.moneiSessionID.htmlName}" value="${pdict.monei.prefs.sessionId}">
+ 
+        <div class="monei-paymentrequest-button-container"></div>
+    </fieldset>
+</div>

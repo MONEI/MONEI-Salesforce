@@ -15,6 +15,14 @@
         {
             "name": "app.payment.processor.monei_bizum",
             "script": "./cartridge/scripts/hooks/payment/processor/bizum/monei_processor"
+        },
+        {
+            "name": "app.payment.form.processor.monei_paymentrequest",
+            "script": "./cartridge/scripts/hooks/payment/processor/paymentrequest/monei_form_processor"
+        },
+        {
+            "name": "app.payment.processor.monei_paymentrequest",
+            "script": "./cartridge/scripts/hooks/payment/processor/paymentrequest/monei_processor"
         }
     ]
 }

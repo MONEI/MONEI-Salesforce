@@ -18,4 +18,7 @@
     <isif condition="${paymentOption.ID === 'MONEI_BIZUM'}">
         <isinclude template="checkout/billing/paymentOptions/monei/moneiBizumContent" />
     </isif>
+    <isif condition="${paymentOption.ID === 'MONEI_PAYMENTREQUEST'}">
+        <isinclude template="checkout/billing/paymentOptions/monei/moneiPaymentRequestContent" />
+    </isif>
 </isloop>

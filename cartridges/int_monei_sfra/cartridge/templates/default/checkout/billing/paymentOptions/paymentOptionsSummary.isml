@@ -9,5 +9,8 @@
         <isif condition="${payment.paymentMethod === 'MONEI_BIZUM'}">
             <isinclude template="checkout/billing/paymentOptions/monei/moneiBizumSummary" />
         </isif>
+        <isif condition="${payment.paymentMethod === 'MONEI_PAYMENTREQUEST'}">
+            <isinclude template="checkout/billing/paymentOptions/monei/moneiPaymentRequestSummary" />
+        </isif>
     </isloop>
 </div>
