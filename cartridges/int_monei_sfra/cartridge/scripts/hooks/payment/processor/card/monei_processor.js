@@ -14,7 +14,7 @@ function Handle(basket, paymentInformation) {
     var serverErrors = [];
 
     Transaction.wrap(function () {
-        var paymentInstruments = currentBasket.getPaymentInstruments(PAYMENT_ID);
+        var paymentInstruments = currentBasket.getPaymentInstruments();
         collections.forEach(paymentInstruments, function (item) {
             currentBasket.removePaymentInstrument(item);
         });

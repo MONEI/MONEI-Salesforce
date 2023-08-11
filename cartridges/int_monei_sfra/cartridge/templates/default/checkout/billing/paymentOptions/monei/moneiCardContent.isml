@@ -8,12 +8,12 @@
                 <isprint value="${pdict.monei.error}" encoding="on" />
             </div>
         </isif>
-        <input type="hidden" class="form-control" name="${pdict.forms.billingForm.paymentMethod.htmlName}" value="MONEI_CARD">
+        <input type="hidden" class="form-control card-paymentMethod-type" name="${pdict.forms.billingForm.paymentMethod.htmlName}" value="MONEI_CARD">
         <input type="hidden" class="form-control" name="${pdict.forms.billingForm.moneiPaymentFields.moneiToken.htmlName}" value="" />
         <input type="hidden" class="form-control" name="${pdict.forms.billingForm.moneiPaymentFields.moneiAmount.htmlName}" value="" />
         <input type="hidden" class="form-control" name="${pdict.forms.billingForm.moneiPaymentFields.moneiCurrency.htmlName}" value="" />
         <input type="hidden" class="form-control" name="${pdict.forms.billingForm.moneiPaymentFields.moneiSessionID.htmlName}" value="${pdict.monei.prefs.sessionId}">
- 
+
         <div class="monei-card-input-container">
             <div class="monei-card-field">
                 <div class="monei-card-name-input monei-input">
@@ -25,5 +25,13 @@
                 </div>
             </div>
         </div>
+
+        <isloop items="${pdict.order.billing.payment.applicablePaymentMethods}" var="paymentOption">
+            <isif condition="${paymentOption.ID === 'MONEI_PAYMENTREQUEST'}">
+                <input type="hidden" class="form-control prequest-paymentMethod-type" disabled name="${pdict.forms.billingForm.paymentMethod.htmlName}" value="MONEI_PAYMENTREQUEST">
+                <div class="monei-paymentrequest-button-container"></div>
+            </isif>
+        </isloop>
+
     </fieldset>
 </div>
