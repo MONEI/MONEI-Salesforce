@@ -160,7 +160,9 @@ function updateOrderPaymentAttributes(paymentInfo, order) {
             if (Object.hasOwnProperty.call(paymentInfo.card, "brand")) {
                 order.custom.moneiBrand = paymentInfo.card.brand;
             }
-            if (Object.hasOwnProperty.call(paymentInfo.card, "type")) {
+            if (Object.hasOwnProperty.call(paymentInfo.card, "tokenizationMethod")) {
+                order.custom.moneiType = paymentInfo.card.tokenizationMethod;
+            } else if (Object.hasOwnProperty.call(paymentInfo.card, "type")) {
                 order.custom.moneiType = paymentInfo.card.type;
             }
             if (Object.hasOwnProperty.call(paymentInfo.card, "cardholderName")) {
