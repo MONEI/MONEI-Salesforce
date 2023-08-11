@@ -80,6 +80,7 @@ function createOrder(req, currentBasket) {
     if (order) {
         result.orderMoneiToken = order.custom.moneiToken;
         result.orderMoneiPaymentId = order.paymentInstruments[0].custom.moneiPaymentID;
+        result.orderMoneiCreditCardHolder = order.paymentInstruments[0].creditCardHolder;
         result.error = false;
     }
 
@@ -207,6 +208,10 @@ function updateNotifiedOrder(response, currentLocale) {
             var result;
 
             if (order) {
+                if (Object.prototype.hasOwnProperty.call(response, 'paymentMethod')) {
+                    moneiHelper.updateOrderPaymentAttributes(response.paymentMethod, order);
+                }
+
                 if (notifiedStatus === moneiPreferences.status.CANCELLED || notifiedStatus === moneiPreferences.status.FAILED || notifiedStatus === moneiPreferences.status.EXPIRED) {
                     result = cancelOrFailOrder(order);
 

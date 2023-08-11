@@ -153,6 +153,32 @@ function createPaymentPayload(currentBasket, paymentInformation) {
     return payload;
 }
 
+function updateOrderPaymentAttributes(paymentInfo, order) {
+    var Transaction = require('dw/system/Transaction');
+    if (Object.hasOwnProperty.call(paymentInfo, "card")) {
+        Transaction.wrap(function () {
+            if (Object.hasOwnProperty.call(paymentInfo.card, "brand")) {
+                order.custom.moneiBrand = paymentInfo.card.brand;
+            }
+            if (Object.hasOwnProperty.call(paymentInfo.card, "type")) {
+                order.custom.moneiType = paymentInfo.card.type;
+            }
+            if (Object.hasOwnProperty.call(paymentInfo.card, "cardholderName")) {
+                order.custom.moneiCardHolder = paymentInfo.card.cardholderName;
+            }
+            if (Object.hasOwnProperty.call(paymentInfo.card, "last4")) {
+                order.custom.moneiLastfour = paymentInfo.card["last4"];
+            }
+        });
+    } else if (Object.hasOwnProperty.call(paymentInfo, "bizum")) {
+        Transaction.wrap(function () {
+            if (Object.hasOwnProperty.call(paymentInfo.bizum, "phoneNumber")) {
+                order.custom.moneiPhoneNumber = paymentInfo.bizum.phoneNumber;
+            }
+        });
+    }
+}
+
 function verifySignature(body, signature) {
     var Mac = require('dw/crypto/Mac');
     var result = {
@@ -184,6 +210,7 @@ module.exports = {
     createErrorMsg: createErrorMsg,
     getUrlPath: getUrlPath,
     createPaymentPayload: createPaymentPayload,
+    updateOrderPaymentAttributes: updateOrderPaymentAttributes,
     verifySignature: verifySignature,
     getPreferences: getPreferences,
     getOrderData: getOrderData,

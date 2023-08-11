@@ -1,16 +1,16 @@
 <div class="payment-details">
     <isloop items="${pdict.order.billing.payment.selectedPaymentInstruments}" var="payment">
-        <isif condition="${payment.paymentMethod === 'CREDIT_CARD'}">
-            <isinclude template="checkout/billing/paymentOptions/creditCardSummary" />
-        </isif>
-        <isif condition="${payment.paymentMethod === 'MONEI_CREDIT'}">
-            <isinclude template="checkout/billing/paymentOptions/monei/moneiCreditSummary" />
+        <isif condition="${payment.paymentMethod === 'MONEI_CARD'}">
+            <isinclude template="checkout/billing/paymentOptions/monei/moneiCardSummary" />
         </isif>
         <isif condition="${payment.paymentMethod === 'MONEI_BIZUM'}">
             <isinclude template="checkout/billing/paymentOptions/monei/moneiBizumSummary" />
         </isif>
         <isif condition="${payment.paymentMethod === 'MONEI_PAYMENTREQUEST'}">
             <isinclude template="checkout/billing/paymentOptions/monei/moneiPaymentRequestSummary" />
+        </isif>
+        <isif condition="${payment.paymentMethod === 'CREDIT_CARD'}">
+            <isinclude template="checkout/billing/paymentOptions/creditCardSummary" />
         </isif>
     </isloop>
 </div>
