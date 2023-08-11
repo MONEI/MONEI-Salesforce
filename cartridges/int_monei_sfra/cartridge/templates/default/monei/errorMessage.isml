@@ -4,10 +4,22 @@
         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
-        <isprint value="${session.custom.moneiErrorMessage}"/>
+
+        <isif condition="${session.custom.moneiErrorStatusCode && !empty(session.custom.moneiErrorStatusCode)}">
+            <isprint value="${session.custom.moneiErrorStatusCode}"/>
+        </isif>
+        <isif condition="${session.custom.moneiErrorStatusMessage && !empty(session.custom.moneiErrorStatusMessage)}">
+            <isprint value="${session.custom.moneiErrorStatusMessage}"/>
+        </isif>
+
+        <isif condition="${empty(session.custom.moneiErrorStatusCode) && empty(session.custom.moneiErrorStatusMessage)}">
+            <isprint value="${session.custom.moneiErrorMessage}"/>
+        </isif>
 
         <isscript>
             delete session.custom.moneiErrorMessage;
+            delete session.custom.moneiErrorStatusCode;
+            delete session.custom.moneiErrorStatusMessage;
         </isscript>
     </div>
 </isif>

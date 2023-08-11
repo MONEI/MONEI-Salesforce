@@ -1,11 +1,11 @@
 <isloop items="${pdict.order.billing.payment.applicablePaymentMethods}" var="paymentOption">
-    <isif condition="${paymentOption.ID === 'CREDIT_CARD'}">
-        <isinclude template="checkout/billing/paymentOptions/creditCardTab" />
-    </isif>
-    <isif condition="${paymentOption.ID === 'MONEI_CREDIT'}">
-        <isinclude template="checkout/billing/paymentOptions/monei/moneiCreditTab" />
+    <isif condition="${paymentOption.ID === 'MONEI_CARD'}">
+        <isinclude template="checkout/billing/paymentOptions/monei/moneiCardTab" />
     </isif>
     <isif condition="${paymentOption.ID === 'MONEI_BIZUM'}">
         <isinclude template="checkout/billing/paymentOptions/monei/moneiBizumTab" />
+    </isif>
+    <isif condition="${paymentOption.ID === 'CREDIT_CARD'}">
+        <isinclude template="checkout/billing/paymentOptions/creditCardTab" />
     </isif>
 </isloop>

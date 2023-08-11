@@ -6,7 +6,7 @@ var moneiAPI = require('*/cartridge/scripts/monei/moneiAPI');
 var moneiHelper = require('*/cartridge/scripts/helpers/moneiHelper');
 var Resource = require('dw/web/Resource');
 
-const PAYMENT_ID = 'MONEI_CREDIT';
+const PAYMENT_ID = 'MONEI_CARD';
 
 function Handle(basket, paymentInformation) {
     var currentBasket = basket;

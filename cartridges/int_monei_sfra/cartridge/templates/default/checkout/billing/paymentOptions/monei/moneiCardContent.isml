@@ -1,25 +1,25 @@
-<div class="tab-pane monei-credit-content monei-content" id="monei-credit-content" role="tabpanel">
+<div class="tab-pane monei-card-content monei-content active" id="monei-card-content" role="tabpanel">
     <fieldset class="payment-form-fields">
         <script>
-            var creditCustomStyles = <isprint value="${pdict.monei.prefs.creditStyles}" encoding="off"/>;
+            var cardCustomStyles = <isprint value="${pdict.monei.prefs.cardStyles}" encoding="off"/>;
         </script>
         <isif condition="${pdict.monei.error !=null}">
             <div class="monei-error">
                 <isprint value="${pdict.monei.error}" encoding="on" />
             </div>
         </isif>
-        <input type="hidden" class="form-control" name="${pdict.forms.billingForm.paymentMethod.htmlName}" value="MONEI_CREDIT">
+        <input type="hidden" class="form-control" name="${pdict.forms.billingForm.paymentMethod.htmlName}" value="MONEI_CARD">
         <input type="hidden" class="form-control" name="${pdict.forms.billingForm.moneiPaymentFields.moneiToken.htmlName}" value="" />
         <input type="hidden" class="form-control" name="${pdict.forms.billingForm.moneiPaymentFields.moneiAmount.htmlName}" value="" />
         <input type="hidden" class="form-control" name="${pdict.forms.billingForm.moneiPaymentFields.moneiCurrency.htmlName}" value="" />
         <input type="hidden" class="form-control" name="${pdict.forms.billingForm.moneiPaymentFields.moneiSessionID.htmlName}" value="${pdict.monei.prefs.sessionId}">
  
-        <div class="monei-credit-input-container">
-            <div class="monei-credit-card-field">
-                <div class="monei-credit-name-input monei-input">
+        <div class="monei-card-input-container">
+            <div class="monei-card-field">
+                <div class="monei-card-name-input monei-input">
                     <input type="text" class="form-control" id="cardOwner" placeholder="${pdict.forms.billingForm.moneiPaymentFields.cardOwner.label}" <isprint value="${pdict.forms.billingForm.moneiPaymentFields.cardOwner.attributes}" encoding="off" /> data-missing-error="${Resource.msg('error.message.required','forms',null)}" />
                 </div>
-                <div class="monei-credit-card-input monei-input"></div>
+                <div class="monei-card-input monei-input"></div>
                 <div class="monei-error">
                     <isprint value="${pdict.forms.billingForm.moneiPaymentFields.cardOwner.error}" encoding="htmlcontent" />
                 </div>

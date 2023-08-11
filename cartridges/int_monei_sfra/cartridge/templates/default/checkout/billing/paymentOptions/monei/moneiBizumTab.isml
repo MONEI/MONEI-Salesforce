@@ -1,10 +1,11 @@
 <li class="nav-item" data-method-id="${paymentOption.ID}">
     <a class="nav-link monei-bizum-tab monei-tab" data-toggle="tab" href="#monei-bizum-content" role="tab">
-        <img class="credit-card-option"
-                src="${URLUtils.staticURL('/images/monei-logo.png')}"
+        <img class="bizum-option"
+                src="${URLUtils.staticURL('/images/logo_MONEI.svg')}"
                 height="32"
                 alt="${Resource.msg("monei.bizum.paymentname", "monei", null)}"
                 title="${Resource.msg("monei.bizum.paymentname", "monei", null)}"
         >
+        ${Resource.msg("monei.bizum.paymentname", "monei", null)}
     </a>
 </li>
