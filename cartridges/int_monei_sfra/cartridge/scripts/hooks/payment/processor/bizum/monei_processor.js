@@ -41,7 +41,6 @@ function Handle(basket, paymentInformation) {
 }
 
 function Authorize(orderNumber, paymentInstrument, paymentProcessor) {
-    var Resource = require('dw/web/Resource');
     var OrderMgr = require('dw/order/OrderMgr');
     var serverErrors = [];
     var error = false;

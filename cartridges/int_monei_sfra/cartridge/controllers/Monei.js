@@ -100,11 +100,11 @@ server.post('failOrder', function (req, res, next) {
         if (!result) {
             var Transaction = require('dw/system/Transaction');
             session.custom.moneiErrorMessage = Resource.msg('error.technical', 'checkout', null);
-            session.custom.moneiErrorStatusCode = req.form.statusCode ? req.form.statusCode : "";
+            session.custom.moneiErrorStatusCode = req.form.statusCode ? req.form.statusCode : '';
             if (req.form.statusCode) {
                 session.custom.moneiErrorStatusMessage = Resource.msg('label.statuscode.' + req.form.statusCode, 'moneistatuscodes', null);
             } else {
-                session.custom.moneiErrorStatusMessage = req.form.statusMessage ? req.form.statusMessage : "";
+                session.custom.moneiErrorStatusMessage = req.form.statusMessage ? req.form.statusMessage : '';
             }
 
             Transaction.wrap(function () {

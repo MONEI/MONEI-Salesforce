@@ -155,27 +155,29 @@ function createPaymentPayload(currentBasket, paymentInformation) {
 
 function updateOrderPaymentAttributes(paymentInfo, order) {
     var Transaction = require('dw/system/Transaction');
-    if (Object.hasOwnProperty.call(paymentInfo, "card")) {
+    var currentOrder = order;
+
+    if (Object.hasOwnProperty.call(paymentInfo, 'card')) {
         Transaction.wrap(function () {
-            if (Object.hasOwnProperty.call(paymentInfo.card, "brand")) {
-                order.custom.moneiBrand = paymentInfo.card.brand;
+            if (Object.hasOwnProperty.call(paymentInfo.card, 'brand')) {
+                currentOrder.custom.moneiBrand = paymentInfo.card.brand;
             }
-            if (Object.hasOwnProperty.call(paymentInfo.card, "tokenizationMethod")) {
-                order.custom.moneiType = paymentInfo.card.tokenizationMethod;
-            } else if (Object.hasOwnProperty.call(paymentInfo.card, "type")) {
-                order.custom.moneiType = paymentInfo.card.type;
+            if (Object.hasOwnProperty.call(paymentInfo.card, 'tokenizationMethod')) {
+                currentOrder.custom.moneiType = paymentInfo.card.tokenizationMethod;
+            } else if (Object.hasOwnProperty.call(paymentInfo.card, 'type')) {
+                currentOrder.custom.moneiType = paymentInfo.card.type;
             }
-            if (Object.hasOwnProperty.call(paymentInfo.card, "cardholderName")) {
-                order.custom.moneiCardHolder = paymentInfo.card.cardholderName;
+            if (Object.hasOwnProperty.call(paymentInfo.card, 'cardholderName')) {
+                currentOrder.custom.moneiCardHolder = paymentInfo.card.cardholderName;
             }
-            if (Object.hasOwnProperty.call(paymentInfo.card, "last4")) {
-                order.custom.moneiLastfour = paymentInfo.card["last4"];
+            if (Object.hasOwnProperty.call(paymentInfo.card, 'last4')) {
+                currentOrder.custom.moneiLastfour = paymentInfo.card.last4;
             }
         });
-    } else if (Object.hasOwnProperty.call(paymentInfo, "bizum")) {
+    } else if (Object.hasOwnProperty.call(paymentInfo, 'bizum')) {
         Transaction.wrap(function () {
-            if (Object.hasOwnProperty.call(paymentInfo.bizum, "phoneNumber")) {
-                order.custom.moneiPhoneNumber = paymentInfo.bizum.phoneNumber;
+            if (Object.hasOwnProperty.call(paymentInfo.bizum, 'phoneNumber')) {
+                currentOrder.custom.moneiPhoneNumber = paymentInfo.bizum.phoneNumber;
             }
         });
     }

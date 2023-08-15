@@ -91,14 +91,14 @@ function cancelOrFailOrder(order) {
     var error = false;
 
     if (order) {
-        if (order.getStatus() != Order.ORDER_STATUS_FAILED && order.getStatus() != Order.ORDER_STATUS_CANCELLED) {
-            if (order.getStatus() == Order.ORDER_STATUS_CREATED) {
+        if (order.getStatus() !== Order.ORDER_STATUS_FAILED && order.getStatus() !== Order.ORDER_STATUS_CANCELLED) {
+            if (order.getStatus() === Order.ORDER_STATUS_CREATED) {
                 Transaction.wrap(function () {
                     order.addNote('Monei', 'failing order');
                     OrderMgr.failOrder(order, true);
                     session.custom.moneiErrorMessage = Resource.msg('error.technical', 'checkout', null);
                 });
-            } else if (order.getStatus() != Order.ORDER_STATUS_CREATED && order.getStatus() != Order.ORDER_STATUS_FAILED) {
+            } else if (order.getStatus() !== Order.ORDER_STATUS_CREATED && order.getStatus() !== Order.ORDER_STATUS_FAILED) {
                 Transaction.wrap(function () {
                     order.addNote('Monei', 'cancelling order');
                     OrderMgr.cancelOrder(order);
@@ -117,14 +117,14 @@ function undoCancelOrFailOrder(order) {
     var error = true;
 
     if (!empty(order)) {
-        if (order.getStatus() == Order.ORDER_STATUS_FAILED) {
+        if (order.getStatus() === Order.ORDER_STATUS_FAILED) {
             Transaction.wrap(function () {
                 order.addNote('Monei', 'undoing fail order');
                 OrderMgr.undoFailOrder(order);
                 error = false;
             });
         }
-        if (order.getStatus() == Order.ORDER_STATUS_CANCELLED) {
+        if (order.getStatus() === Order.ORDER_STATUS_CANCELLED) {
             Transaction.wrap(function () {
                 order.addNote('Monei', 'undoing cancel order');
                 OrderMgr.undoCancelOrder(order);
@@ -143,7 +143,7 @@ function placeOrder(order, currentLocale, paymentResult, paymentMethod, restoreB
     if (order) {
         undoCancelOrFailOrder(order);
 
-        if (order.getStatus() == Order.ORDER_STATUS_CREATED) {
+        if (order.getStatus() === Order.ORDER_STATUS_CREATED) {
             var handlePaymentResult = COHelpers.handlePayments(order, order.orderNo);
             if (handlePaymentResult.error) {
                 return {
@@ -176,7 +176,7 @@ function placeOrder(order, currentLocale, paymentResult, paymentMethod, restoreB
             });
         }
 
-        if (paymentMethod.method == 'card' && Object.prototype.hasOwnProperty.call(paymentMethod, 'card')) {
+        if (paymentMethod.method === 'card' && Object.prototype.hasOwnProperty.call(paymentMethod, 'card')) {
             Transaction.wrap(function () {
                 if (Object.prototype.hasOwnProperty.call(paymentMethod.card, 'brand')) {
                     order.paymentInstrument.setCreditCardType(paymentMethod.card.brand);

@@ -1,7 +1,6 @@
 'use strict';
 
 var PaymentMgr = require('dw/order/PaymentMgr');
-var PaymentInstrument = require('dw/order/PaymentInstrument');
 var StringUtils	= require('dw/util/StringUtils');
 var collections = require('*/cartridge/scripts/util/collections');
 

@@ -12,7 +12,7 @@ var confirmationPaymentErrorStatus = [
 ];
 
 function moneiTokenHandler(token, selector) {
-    $container = $(selector);
+    var $container = $(selector);
 
     $container.find('[name="dwfrm_billing_moneiPaymentFields_moneiToken"]').val(token);
     $container.find('[name="dwfrm_billing_moneiPaymentFields_moneiAmount"]').val(moneiOrderData.amount);
@@ -39,6 +39,31 @@ function initBizum() {
         }
     });
     bizum.render('#monei-bizum-content .monei-bizum-button-container');
+}
+
+function initPaymentrequest() {
+    if (paymentrequest) {
+        paymentrequest.close();
+    }
+
+    paymentrequest = monei.PaymentRequest({ // eslint-disable-new-cap
+        accountId: $('[name="monei_id"]').val(),
+        sessionId: $('[name="dwfrm_billing_moneiPaymentFields_moneiSessionID"]').val(),
+        amount: moneiOrderData.amount,
+        currency: moneiOrderData.currency,
+        language: $('[name="monei_lang"]').val(),
+        onSubmit(result) {
+            $('.card-paymentMethod-type').prop('disabled', true);
+            $('.prequest-paymentMethod-type').prop('disabled', false);
+            moneiTokenHandler(result.token, '.monei-card-content');
+            $('.submit-payment').trigger('click');
+        },
+        onError(error) {
+            $('.monei-error').html(error);
+            $('.monei-error').show();
+        }
+    });
+    paymentrequest.render('#monei-card-content .monei-paymentrequest-button-container');
 }
 
 function initCard() {
@@ -74,41 +99,15 @@ function initCard() {
     }
 }
 
-
-function initPaymentrequest() {
-    if (paymentrequest) {
-        paymentrequest.close();
-    }
-
-    paymentrequest = monei.PaymentRequest({ // eslint-disable-new-cap
-        accountId: $('[name="monei_id"]').val(),
-        sessionId: $('[name="dwfrm_billing_moneiPaymentFields_moneiSessionID"]').val(),
-        amount: moneiOrderData.amount,
-        currency: moneiOrderData.currency,
-        language: $('[name="monei_lang"]').val(),
-        onSubmit(result) {
-            $('.card-paymentMethod-type').prop('disabled', true);
-            $('.prequest-paymentMethod-type').prop('disabled', false);
-            moneiTokenHandler(result.token, '.monei-card-content');
-            $('.submit-payment').trigger('click');
-        },
-        onError(error) {
-            $('.monei-error').html(error);
-            $('.monei-error').show();
-        }
-    });
-    paymentrequest.render('#monei-card-content .monei-paymentrequest-button-container');
-}
-
-function manageCardForm () {
-    $('#monei-card-content .monei-card-name-input input').off('focus').on('focus', function() {
+function manageCardForm() {
+    $('#monei-card-content .monei-card-name-input input').off('focus').on('focus', function () {
         $('#monei-card-content .monei-card-name-input').addClass('is-focused');
     });
-    $('#monei-card-content .monei-card-name-input input').off('blur').on('blur', function() {
+    $('#monei-card-content .monei-card-name-input input').off('blur').on('blur', function () {
         $('#monei-card-content .monei-card-name-input').removeClass('is-focused');
     });
-    $('#monei-card-content .monei-card-name-input input').off('change.validation blur.validation').on('change.validation blur.validation', function() {
-        if ($('#monei-card-content .monei-card-name-input input').val() === "") {
+    $('#monei-card-content .monei-card-name-input input').off('change.validation blur.validation').on('change.validation blur.validation', function () {
+        if ($('#monei-card-content .monei-card-name-input input').val() === '') {
             $('#monei-card-content .monei-card-name-input').addClass('is-invalid');
             $('#monei-card-content .monei-error').html($('#monei-card-content .monei-card-name-input input').data('missing-error'));
         } else {
@@ -128,7 +127,7 @@ function manageCardForm () {
                 e.stopImmediatePropagation();
                 window.localStorage.setItem('monei_card_payment', true);
 
-                if ($('#monei-card-content .monei-card-name-input input').val() == '') {
+                if ($('#monei-card-content .monei-card-name-input input').val() === '') {
                     $('#monei-card-content .monei-card-name-input').addClass('is-invalid');
                     $('#monei-card-content .monei-error').html($('#monei-card-content .monei-card-name-input input').data('missing-error'));
                     window.localStorage.removeItem('monei_card_payment');
@@ -199,7 +198,7 @@ function managePaymentSelections() {
         });
 
         setTimeout(function () {
-            if ($("[data-checkout-stage]").attr("data-checkout-stage") === "payment") {
+            if ($('[data-checkout-stage]').attr('data-checkout-stage') === 'payment') {
                 var $submitPaymentBtn = $('.submit-payment');
                 if ($(e.target).hasClass('active')) {
                     var currentPaymentId = $(e.target).parent().attr('data-method-id').toLowerCase();
@@ -297,7 +296,7 @@ function switchPlaceOrderBtn() {
     }
 }
 
-function failCreatedOrderAsync(orderId, restoreBasket, statusCode = "", statusMessage = "") {
+function failCreatedOrderAsync(orderId, restoreBasket, statusCode = '', statusMessage = '') {
     if ($('[name="monei_failOrderEndpoint"]').length > 0) {
         $.ajax({
             url: $('[name="monei_failOrderEndpoint"]').val(),
@@ -336,17 +335,6 @@ function placeCreatedOrderAsync(result, orderId) {
             },
             success: function (data) {
                 if (!data.error) {
-                    var continueUrl = data.continueUrl;
-                    var urlParams = {
-                        ID: data.orderId,
-                        token: data.orderToken ? data.orderToken : null
-                    };
-
-                    continueUrl += (continueUrl.indexOf('?') !== -1 ? '&' : '?') +
-                        Object.keys(urlParams).map(function (key) {
-                            return key + '=' + encodeURIComponent(urlParams[key]);
-                        }).join('&');
-
                     if (result.nextAction && result.nextAction.mustRedirect) {
                         window.location.href = result.nextAction.redirectUrl;
                     } else {
@@ -373,7 +361,8 @@ function moneiComponentConfirmPayment(data) {
         paymentId: data.orderMoneiPaymentId,
         paymentToken: data.orderMoneiToken,
         language: $('[name="monei_lang"]').val()
-    }
+    };
+
     if (Object.hasOwnProperty.call(data, 'orderMoneiCreditCardHolder') && data.orderMoneiCreditCardHolder) {
         payload.paymentMethod = {
             card: {
