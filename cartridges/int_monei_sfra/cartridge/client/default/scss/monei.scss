@@ -119,6 +119,10 @@
         width: 80px;
         margin-right: 20px;
     }
+
+    @media screen and (max-width: 543px) {
+        text-align: left;
+    }
 }
 
 .monei-place-order {
