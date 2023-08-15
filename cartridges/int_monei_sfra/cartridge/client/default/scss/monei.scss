@@ -1,3 +1,7 @@
+.monei-paymentrequest-button-container {
+    margin-top: 50px;
+}
+
 .monei-card-input-container {
     .monei-input {
         input {
@@ -114,6 +118,10 @@
     img {
         width: 80px;
         margin-right: 20px;
+    }
+
+    @media screen and (max-width: 543px) {
+        text-align: left;
     }
 }
 

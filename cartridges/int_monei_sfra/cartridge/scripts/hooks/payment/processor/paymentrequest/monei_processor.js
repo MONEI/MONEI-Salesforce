@@ -6,7 +6,7 @@ var moneiAPI = require('*/cartridge/scripts/monei/moneiAPI');
 var moneiHelper = require('*/cartridge/scripts/helpers/moneiHelper');
 var Resource = require('dw/web/Resource');
 
-const PAYMENT_ID = 'MONEI_CARD';
+const PAYMENT_ID = 'MONEI_PAYMENTREQUEST';
 
 function Handle(basket, paymentInformation) {
     var currentBasket = basket;
@@ -20,13 +20,13 @@ function Handle(basket, paymentInformation) {
         });
 
         currentBasket.createPaymentInstrument(PAYMENT_ID, currentBasket.totalGrossPrice);
+
         var result = moneiAPI.createPayment(moneiHelper.createPaymentPayload(basket, paymentInformation));
         if (result && !Object.prototype.hasOwnProperty.call(result, 'err')) {
             currentBasket.custom.moneiToken = paymentInformation.moneiToken.value.toString();
             currentBasket.custom.moneiSessionID = paymentInformation.moneiSessionID.value.toString();
             currentBasket.custom.moneiOrderNo = result.orderId;
             currentBasket.paymentInstrument.custom.moneiPaymentID = result.id;
-            currentBasket.paymentInstrument.setCreditCardHolder(paymentInformation.cardOwner.value.toString());
         } else {
             error = true;
             if (Object.prototype.hasOwnProperty.call(result, 'err')) {
